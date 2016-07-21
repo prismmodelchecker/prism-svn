@@ -64,6 +64,7 @@ $(PRISM_DIR_REL)/$(OBJ_DIR)/$(THIS_DIR)/ngprism$(EXE): ngprism.c
 
 clean: checks
 	@rm -f $(CLASS_FILES) $(PRISM_DIR_REL)/$(LIB_DIR)/$(LIBPREFIX)prism$(LIBSUFFIX) $(O_FILES) $(PRISM_DIR_REL)/$(OBJ_DIR)/$(THIS_DIR)/ngprism$(EXE)
+	@sed -i '/EXACT_LP_REQUIREMENTS_INSTALLED/c\	public final int EXACT_LP_REQUIREMENTS_INSTALLED = 1;' PrismSettings.java
 
 celan: clean
 

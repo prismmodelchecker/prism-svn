@@ -1,0 +1,320 @@
+diff --git a/src/glpapi06.c b/src/glpapi06.c
+index f526e72..e67f5e1 100644
+--- a/src/glpapi06.c
++++ b/src/glpapi06.c
+@@ -209,7 +209,8 @@ up:         col->stat = GLP_NU, col->prim = col->ub;
+       }
+       if (parm->msg_lev >= GLP_MSG_ALL && parm->out_dly == 0)
+       {  if (P->pbs_stat == GLP_FEAS && P->dbs_stat == GLP_FEAS)
+-            xprintf("OPTIMAL SOLUTION FOUND\n");
++            return;
++            //xprintf("OPTIMAL SOLUTION FOUND\n");
+          else if (P->pbs_stat == GLP_NOFEAS)
+             xprintf("PROBLEM HAS NO FEASIBLE SOLUTION\n");
+          else if (parm->meth == GLP_PRIMAL)
+@@ -501,6 +502,8 @@ void glp_init_smcp(glp_smcp *parm)
+       parm->out_frq = 500;
+       parm->out_dly = 0;
+       parm->presolve = GLP_OFF;
++      parm->precision = 64;
++      parm->num_states = 10;
+       return;
+ }
+ 
+@@ -783,6 +786,90 @@ double glp_get_col_dual(glp_prob *lp, int j)
+ /***********************************************************************
+ *  NAME
+ *
++*  glp_get_probs - retrieve fixed precision solutions array
++*
++*  SYNOPSIS
++*
++*  unsigned char **glp_get_probs(glp_prob *lp);
++*
++*  RETURNS
++*
++*  The routine glp_get_probs returns the array of fixed precision
++*  solutions. */
++
++unsigned char **glp_get_probs(glp_prob *lp)
++{
++      unsigned char **probs;
++      probs = lp->probs;
++      return probs;
++}
++
++/***********************************************************************
++*  NAME
++*
++*  glp_get_exps - retrieve exponent positions for each solution
++*
++*  SYNOPSIS
++*
++*  int *glp_get_exps(glp_prob *lp);
++*
++*  RETURNS
++*
++*  The routine glp_get_exps returns the positions of the exponents 
++*  for each solution in probs array. */
++
++int *glp_get_exps(glp_prob *lp)
++{
++      int *exps;
++      exps = lp->exps;
++      return exps;
++}
++
++/***********************************************************************
++*  NAME
++*
++*  glp_get_nums - retrieve numerators of exact rational solutions 
++*
++*  SYNOPSIS
++*
++*  unsigned char *glp_get_nums(glp_prob *lp);
++*
++*  RETURNS
++*
++*  The routine glp_get_nums returns the numerators for 
++*  each exact rational arithmetic solution. */
++
++unsigned char **glp_get_nums(glp_prob *lp)
++{
++      unsigned char **nums;
++      nums = lp->nums;
++      return nums;
++}
++
++/***********************************************************************
++*  NAME
++*
++*  glp_get_dens - retrieve denominators of exact rational solutions
++*
++*  SYNOPSIS
++*
++*  unsigned char **glp_get_dens(glp_prob *lp);
++*
++*  RETURNS
++*
++*  The routine glp_get_dens returns the denominators for 
++*  each exact rational arithmetic solution. */
++
++unsigned char **glp_get_dens(glp_prob *lp)
++{     
++      unsigned char **dens;
++      dens = lp->dens;
++      return dens;
++}
++
++/***********************************************************************
++*  NAME
++*
+ *  glp_get_unbnd_ray - determine variable causing unboundedness
+ *
+ *  SYNOPSIS
+diff --git a/src/glpapi07.c b/src/glpapi07.c
+index 89a06bf..3fe33a2 100644
+--- a/src/glpapi07.c
++++ b/src/glpapi07.c
+@@ -125,7 +125,8 @@ static void set_d_eps(mpq_t x, double val)
+       if (s < 0) mpq_neg(x, x);
+       /* check that the desired tolerance has been attained */
+       xassert(fabs(val - mpq_get_d(x)) <= eps * (1.0 + fabs(val)));
+-done: return;
++done:
++      return;
+ }
+ 
+ static void load_data(SSX *ssx, glp_prob *lp)
+@@ -159,8 +160,10 @@ static void load_data(SSX *ssx, glp_prob *lp)
+             default: xassert(type != type);
+          }
+          ssx->type[k] = type;
+-         set_d_eps(ssx->lb[k], lb);
+-         set_d_eps(ssx->ub[k], ub);
++         //set_d_eps(ssx->lb[k], lb);
++         //set_d_eps(ssx->ub[k], ub);
++         mpq_set_d(ssx->lb[k], lb);
++         mpq_set_d(ssx->ub[k], ub);
+       }
+       /* optimization direction */
+       switch (lp->dir)
+@@ -176,7 +179,8 @@ static void load_data(SSX *ssx, glp_prob *lp)
+             coef = 0.0;
+          else
+             coef = lp->col[k-m]->coef;
+-         set_d_eps(ssx->coef[k], coef);
++         //set_d_eps(ssx->coef[k], coef);
++         mpq_set_d(ssx->coef[k], coef);
+       }
+       /* constraint coefficients */
+       ind = xcalloc(1+m, sizeof(int));
+@@ -188,7 +192,8 @@ static void load_data(SSX *ssx, glp_prob *lp)
+          for (k = 1; k <= len; k++)
+          {  loc++;
+             ssx->A_ind[loc] = ind[k];
+-            set_d_eps(ssx->A_val[loc], val[k]);
++            //set_d_eps(ssx->A_val[loc], val[k]);
++            mpq_set_d(ssx->A_val[loc], val[k]);
+          }
+       }
+       xassert(loc == nnz);
+@@ -262,8 +267,14 @@ int glp_exact(glp_prob *lp, const glp_smcp *parm)
+       int m = lp->m;
+       int n = lp->n;
+       int nnz = lp->nnz;
+-      int i, j, k, type, pst, dst, ret, stat;
++      int i, j, k, type, pst, dst, ret, stat, actual_state, index;
+       double lb, ub, prim, dual, sum;
++      char *exact_prob;
++      /* fixed precision initial parameters */
++      mpf_t fix_prob;
++      mpf_init(fix_prob);
++      mpf_set_prec(fix_prob, parm->precision);
++      mp_exp_t exponent;
+       if (parm == NULL)
+          parm = &_parm, glp_init_smcp((glp_smcp *)parm);
+       /* check control parameters */
+@@ -273,11 +284,26 @@ int glp_exact(glp_prob *lp, const glp_smcp *parm)
+       if (parm->tm_lim < 0)
+          xerror("glp_exact: tm_lim = %d; invalid parameter\n",
+             parm->tm_lim);
++      if (parm->num_states <= 0)
++         xerror("glp_exact: num_states = %d; invalid parameter\n",
++            parm->num_states);
++      if (parm->precision <= 0)
++         xerror("glp_exact: precision = %d; invalid parameter\n",
++            parm->precision);
+       /* the problem must have at least one row and one column */
+       if (!(m > 0 && n > 0))
+       {  xprintf("glp_exact: problem has no rows/columns\n");
+          return GLP_EFAIL;
+       }
++      actual_state = 0;
++      /* alloc memory for storing exact probabilities */
++      lp->nums = (unsigned char **) malloc(parm->num_states * sizeof(unsigned char*));
++      lp->dens = (unsigned char **) malloc(parm->num_states * sizeof(unsigned char*));
++      /* alloc memory for storing fixed probabilities */
++      lp->exps = (int *) malloc(parm->num_states * sizeof(int));
++      lp->probs = (unsigned char **) malloc(parm->num_states * sizeof(unsigned char*));
++      for (index = 0; index < parm->num_states; index++)
++         lp->probs[index] = (unsigned char *) malloc(mpf_get_prec(fix_prob) * sizeof(unsigned char));
+ #if 1
+       /* basic solution is currently undefined */
+       lp->pbs_stat = lp->dbs_stat = GLP_UNDEF;
+@@ -303,14 +329,14 @@ int glp_exact(glp_prob *lp, const glp_smcp *parm)
+          }
+       }
+       /* create the simplex solver workspace */
+-      xprintf("glp_exact: %d rows, %d columns, %d non-zeros\n",
+-         m, n, nnz);
++      //xprintf("glp_exact: %d rows, %d columns, %d non-zeros\n",
++        // m, n, nnz);
+ #ifdef HAVE_GMP
+-      xprintf("GNU MP bignum library is being used\n");
++      //xprintf("GNU MP bignum library is being used\n");
+ #else
+-      xprintf("GLPK bignum module is being used\n");
+-      xprintf("(Consider installing GNU MP to attain a much better perf"
+-         "ormance.)\n");
++      //xprintf("GLPK bignum module is being used\n");
++      //xprintf("(Consider installing GNU MP to attain a much better perf"
++         //"ormance.)\n");
+ #endif
+       ssx = ssx_create(m, n, nnz);
+       /* load LP problem data into the workspace */
+@@ -433,6 +459,14 @@ int glp_exact(glp_prob *lp, const glp_smcp *parm)
+                   xassert(ssx != ssx);
+             }
+             dual = mpq_get_d(ssx->cbar[j]);
++            /* exact rational results */
++            lp->nums[actual_state] = mpz_get_str(NULL, 10, mpq_numref(ssx->cbar[j]));
++            lp->dens[actual_state] = mpz_get_str(NULL, 10, mpq_denref(ssx->cbar[j]));
++            /* fixed results */
++            mpf_set_q(fix_prob, ssx->cbar[j]);
++            lp->probs[actual_state] = mpf_get_str(NULL, &exponent, 10, 0, fix_prob);
++            lp->exps[actual_state] = exponent;
++            actual_state++;
+          }
+          if (k <= m)
+          {  glp_set_row_stat(lp, k, stat);
+@@ -456,5 +490,3 @@ done: /* delete the simplex solver workspace */
+       /* return to the application program */
+       return ret;
+ }
+-
+-/* eof */
+diff --git a/src/glpk.h b/src/glpk.h
+index 137801c..654a232 100644
+--- a/src/glpk.h
++++ b/src/glpk.h
+@@ -137,6 +137,8 @@ typedef struct
+       int out_frq;            /* spx.out_frq */
+       int out_dly;            /* spx.out_dly (milliseconds) */
+       int presolve;           /* enable/disable using LP presolver */
++      int precision;          /* current precision */
++      int num_states;         /* number of states */
+       double foo_bar[36];     /* (reserved) */
+ } glp_smcp;
+ 
+@@ -496,6 +498,18 @@ double glp_get_col_prim(glp_prob *P, int j);
+ double glp_get_col_dual(glp_prob *P, int j);
+ /* retrieve column dual value (basic solution) */
+ 
++unsigned char **glp_get_probs(glp_prob *lp);
++/* retrieve fixed precision solutions array */
++
++int *glp_get_exps(glp_prob *lp);
++/* retrieve exponent positions for each solution */
++
++unsigned char **glp_get_nums(glp_prob *lp);
++/* retrieve the numerators for each exact rational solution */
++
++unsigned char **glp_get_dens(glp_prob *lp);
++/* retrieve the denominators for each exact rational solution */
++
+ int glp_get_unbnd_ray(glp_prob *P);
+ /* determine variable causing unboundedness */
+ 
+diff --git a/src/glpssx02.c b/src/glpssx02.c
+index 4b3ea97..4a810a4 100644
+--- a/src/glpssx02.c
++++ b/src/glpssx02.c
+@@ -31,9 +31,9 @@ static void show_progress(SSX *ssx, int phase)
+       int i, def = 0;
+       for (i = 1; i <= ssx->m; i++)
+          if (ssx->type[ssx->Q_col[i]] == SSX_FX) def++;
+-      xprintf("%s%6d:   %s = %22.15g   (%d)\n", phase == 1 ? " " : "*",
+-         ssx->it_cnt, phase == 1 ? "infsum" : "objval",
+-         mpq_get_d(ssx->bbar[0]), def);
++      //xprintf("%s%6d:   %s = %22.15g   (%d)\n", phase == 1 ? " " : "*",
++         //ssx->it_cnt, phase == 1 ? "infsum" : "objval",
++         //mpq_get_d(ssx->bbar[0]), def);
+ #if 0
+       ssx->tm_lag = utime();
+ #else
+@@ -446,7 +446,7 @@ skip: /* compute simplex multipliers */
+       ret = ssx_phase_II(ssx);
+       switch (ret)
+       {  case 0:
+-            xprintf("OPTIMAL SOLUTION FOUND\n");
++            //xprintf("OPTIMAL SOLUTION FOUND\n");
+             ret = 0;
+             break;
+          case 1:
+diff --git a/src/prob.h b/src/prob.h
+index 4c1d34e..fc675d9 100644
+--- a/src/prob.h
++++ b/src/prob.h
+@@ -143,6 +143,11 @@ struct glp_prob
+          GLP_NOFEAS - no integer solution exists */
+       double mip_obj;
+       /* objective function value */
++      /* for exact solver values storage */
++      unsigned char **probs;  /* values of the probabilities */
++      int *exps;              /* exponents of the probabilities */
++      unsigned char **nums;   /* rational numerators */
++      unsigned char **dens;   /* rational denominators */
+ };
+ 
+ struct GLPROW

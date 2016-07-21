@@ -1,0 +1,54 @@
+diff --git a/swig/glpk.i b/swig/glpk.i
+index bf7d91f..e5ba65f 100644
+--- a/swig/glpk.i
++++ b/swig/glpk.i
+@@ -334,6 +334,8 @@ glp_java_vertex_data *glp_java_vertex_get_data(
+ %include "glpk_java_arrays.i"
+ %glp_array_functions(int, intArray)
+ %glp_array_functions(double, doubleArray)
++%glp_array_functions(unsigned char, uint8Array)
++%glp_array_functions(unsigned char *, uint8ArrayArray)
+ 
+ // Add handling for String arrays in glp_main
+ %include "various.i"
+diff --git a/swig/glpk_java_arrays.i b/swig/glpk_java_arrays.i
+index 214cec7..e4ecaaa 100644
+--- a/swig/glpk_java_arrays.i
++++ b/swig/glpk_java_arrays.i
+@@ -29,11 +29,19 @@ static TYPE NAME##_getitem(TYPE *ary, int index) {
+     return (TYPE) 0;
+   }
+ }
++
+ static void NAME##_setitem(TYPE *ary, int index, TYPE value) {
+   if (ary != NULL) {
+     ary[index] = value;
+   }
+ }
++
++static char *NAME##_toString(TYPE *ary) {
++  char *str;
++  str = (char *)ary;
++  return str;
++}
++
+ %}
+ 
+ %javamethodmodifiers new_##NAME(int nelements) "
+@@ -85,6 +93,16 @@ TYPE NAME##_getitem(TYPE *ary, int index);
+ public";
+ void NAME##_setitem(TYPE *ary, int index, TYPE value);
+ 
++%javamethodmodifiers NAME##_toString(TYPE* ary) "
++/**
++ * Sets the value of an element of an array of TYPE.
++ * <p>BEWARE: The validity of the index is not checked.
++ *
++ * @param ary array
++ */
++public";
++char *NAME##_toString(TYPE *ary);
++
+ %enddef
+ /* Old Swig versions require a LF after enddef */
+ 
