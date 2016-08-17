@@ -89,7 +89,7 @@ public class PrismSettings implements Observer
 	public static final	String PRISM_TERM_CRIT						= "prism.termCrit";//"prism.termination";
 	public static final	String PRISM_TERM_CRIT_PARAM				= "prism.termCritParam";//"prism.terminationEpsilon";
 	public static final	String PRISM_MAX_ITERS						= "prism.maxIters";//"prism.maxIterations";
-	public static final	String PRISM_PRECISION						= "prism.precision";//"prism.precision";
+	public static final	String PRISM_EXACTLP_PRECISION				= "prism.exactlpPrecision";//"prism.exactlpPrecision";
 
 	public static final	String PRISM_CUDD_MAX_MEM					= "prism.cuddMaxMem";
 	public static final	String PRISM_CUDD_EPSILON					= "prism.cuddEpsilon";
@@ -103,7 +103,7 @@ public class PrismSettings implements Observer
 	public static final String PRISM_SCC_METHOD						= "prism.sccMethod";
 	public static final String PRISM_SYMM_RED_PARAMS					= "prism.symmRedParams";
 	public static final	String PRISM_EXACT_ENABLED					= "prism.exact.enabled";
-	public static final	String PRISM_EXACT_LP_ENABLED					= "prism.exact.enabled";
+	public static final	String PRISM_EXACTLP_ENABLED					= "prism.exactlp.enabled";
 	public static final String PRISM_PTA_METHOD					= "prism.ptaMethod";
 	public static final String PRISM_TRANSIENT_METHOD				= "prism.transientMethod";
 	public static final String PRISM_AR_OPTIONS					= "prism.arOptions";
@@ -230,7 +230,7 @@ public class PrismSettings implements Observer
 																			"Which engine (hybrid, sparse, MTBDD, explicit) should be used for model checking." },
 			{ BOOLEAN_TYPE,		PRISM_EXACT_ENABLED,					"Do exact model checking",			"4.2.1",			new Boolean(false),															"",
 																			"Perform exact model checking." },
-			{ BOOLEAN_TYPE,		PRISM_EXACT_LP_ENABLED,					"Do exact model checking using linear programming",			"4.2.1",			new Boolean(false),															"",
+			{ BOOLEAN_TYPE,		PRISM_EXACTLP_ENABLED,					"Do exact model checking using linear programming",			"4.3.1",			new Boolean(false),															"",
 																			"Perform exact model checking using linear programming." },
 																			
 			{ CHOICE_TYPE,		PRISM_PTA_METHOD,						"PTA model checking method",			"3.3",			"Stochastic games",																	"Digital clocks,Stochastic games,Backwards reachability",																
@@ -252,7 +252,7 @@ public class PrismSettings implements Observer
 																			"Epsilon value to use for checking termination of iterative numerical methods." },
 			{ INTEGER_TYPE,		PRISM_MAX_ITERS,						"Termination max. iterations",			"2.1",			new Integer(10000),															"0,",																						
 																			"Maximum number of iterations to perform if iterative methods do not converge." },
-			{ INTEGER_TYPE,		PRISM_PRECISION,						"Floating point precision",			"2.1",			new Integer(64),															"1,",																						
+			{ INTEGER_TYPE,		PRISM_EXACTLP_PRECISION,				"Exact linear programming precision",			"4.3.1",			new Integer(64),															"1,",																						
 																			"The accuracy of the mantissa (in bits) is determined by this variable. This user-selectable precision is a minimum value: it is rounded up to a whole limb." },
 			// MODEL CHECKING OPTIONS:
 			{ BOOLEAN_TYPE,		PRISM_PRECOMPUTATION,					"Use precomputation",					"2.1",			new Boolean(true),															"",																							
@@ -917,7 +917,7 @@ public class PrismSettings implements Observer
 		}
 		// Exact linear programming model checking
 		else if (sw.equals("exact-lp")) {
-			set(PRISM_EXACT_LP_ENABLED, true);
+			set(PRISM_EXACTLP_ENABLED, true);
 			set(PRISM_MDP_SOLN_METHOD, "Exact linear programming");
 			set(PRISM_LIN_EQ_METHOD, "Exact linear programming");
 		}
@@ -1047,7 +1047,7 @@ public class PrismSettings implements Observer
 					j = Integer.parseInt(args[++i]);
 					if (j <= 0)
 						throw new NumberFormatException("");
-					set(PRISM_PRECISION, j);
+					set(PRISM_EXACTLP_PRECISION, j);
 				} catch (NumberFormatException e) {
 					throw new PrismException("Invalid value for -" + sw + " switch");
 				}

@@ -222,7 +222,7 @@ public class ProbModelChecker extends NonProbModelChecker
 			// PRISM_MAX_ITERS
 			setMaxIters(settings.getInteger(PrismSettings.PRISM_MAX_ITERS));
 			// PRISM_PRECISION
-			setPrecision(settings.getInteger(PrismSettings.PRISM_PRECISION));
+			setPrecision(settings.getInteger(PrismSettings.PRISM_EXACTLP_PRECISION));
 			// PRISM_PRECOMPUTATION
 			setPrecomp(settings.getBoolean(PrismSettings.PRISM_PRECOMPUTATION));
 			// PRISM_PROB0
