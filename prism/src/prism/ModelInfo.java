@@ -120,6 +120,11 @@ public interface ModelInfo
 	public int getNumRewardStructs();
 	
 	/**
+	 * Get a list of the names of the reward structures in the model.
+	 */
+	public List<String> getRewardStructNames();
+	
+	/**
 	 * Get the index of a module by its name
 	 * (indexed from 0, not from 1 like at the user (property language) level).
 	 * Returns -1 if name does not exist.

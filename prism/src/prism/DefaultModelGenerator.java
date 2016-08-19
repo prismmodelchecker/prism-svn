@@ -28,8 +28,10 @@
 package prism;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import edu.jas.util.ArrayUtil;
 import parser.State;
 import parser.Values;
 import parser.ast.RewardStruct;
@@ -114,18 +116,26 @@ public abstract class DefaultModelGenerator implements ModelGenerator
 	@Override
 	public int getNumRewardStructs()
 	{
-		return 0;
+		return getRewardStructNames().size();
+	}
+	
+	@Override
+	public List<String> getRewardStructNames()
+	{
+		// No reward structures by default
+		return Collections.emptyList();
 	}
 	
 	@Override
 	public int getRewardStructIndex(String name)
 	{
-		return -1;
+		return getRewardStructNames().indexOf(name);
 	}
 	
 	@Override
 	public RewardStruct getRewardStruct(int i)
 	{
+		// No reward structures by default
 		return null;
 	}
 	
