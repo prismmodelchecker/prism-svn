@@ -103,7 +103,7 @@ public class ModulesFileModelGenerator extends DefaultModelGenerator
 		transitionListBuilt = false;
 	}
 	
-	// Model info
+	// Methods for ModelInfo interface
 	
 	@Override
 	public ModelType getModelType()
@@ -180,16 +180,16 @@ public class ModulesFileModelGenerator extends DefaultModelGenerator
 		return labelList.getLabelIndex(label);
 	}
 	
-	//@Override
-	public VarList getVarList()
-	{
-		return varList;
-	}
-	
 	@Override
 	public int getNumRewardStructs()
 	{
 		return modulesFile.getNumRewardStructs();
+	}
+	
+	@Override
+	public List<String> getRewardStructNames()
+	{
+		return modulesFile.getRewardStructNames();
 	}
 	
 	@Override
@@ -204,6 +204,8 @@ public class ModulesFileModelGenerator extends DefaultModelGenerator
 		return modulesFile.getRewardStruct(i);
 	}
 
+	// Methods for ModelGenerator interface
+	
 	@Override
 	public boolean hasSingleInitialState() throws PrismException
 	{
@@ -324,22 +326,6 @@ public class ModulesFileModelGenerator extends DefaultModelGenerator
 		return getTransitionList().computeTransitionTarget(index, exploreState);
 	}
 	
-	//@Override
-	public void calculateStateRewards(State state, double[] store) throws PrismLangException
-	{
-		updater.calculateStateRewards(state, store);
-	}
-	
-	//@Override
-	public void getRandomInitialState(RandomNumberGenerator rng, State initialState) throws PrismException
-	{
-		if (modulesFile.getInitialStates() == null) {
-			initialState.copy(modulesFile.getDefaultInitialState());
-		} else {
-			throw new PrismException("Random choice of multiple initial states not yet supported");
-		}
-	}
-
 	@Override
 	public boolean isLabelTrue(int i) throws PrismException
 	{
@@ -364,7 +350,31 @@ public class ModulesFileModelGenerator extends DefaultModelGenerator
 		}
 		return d;
 	}
+
+	//@Override
+	public void calculateStateRewards(State state, double[] store) throws PrismLangException
+	{
+		updater.calculateStateRewards(state, store);
+	}
 	
+	@Override
+	public VarList createVarList()
+	{
+		return varList;
+	}
+	
+	// Miscellaneous (unused?) methods
+	
+	//@Override
+	public void getRandomInitialState(RandomNumberGenerator rng, State initialState) throws PrismException
+	{
+		if (modulesFile.getInitialStates() == null) {
+			initialState.copy(modulesFile.getDefaultInitialState());
+		} else {
+			throw new PrismException("Random choice of multiple initial states not yet supported");
+		}
+	}
+
 	// Local utility methods
 	
 	/**
@@ -378,11 +388,5 @@ public class ModulesFileModelGenerator extends DefaultModelGenerator
 			transitionListBuilt = true;
 		}
 		return transitionList;
-	}
-
-	@Override
-	public VarList createVarList()
-	{
-		return varList;
 	}
 }
