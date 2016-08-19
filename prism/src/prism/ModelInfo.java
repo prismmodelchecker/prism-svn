@@ -100,6 +100,11 @@ public interface ModelInfo
 	public int getNumLabels();
 	
 	/**
+	 * Get the names of all the labels in the model.
+	 */
+	public List<String> getLabelNames();
+	
+	/**
 	 * Get the name of the {@code i}th label of the model.
 	 */
 	public String getLabelName(int i) throws PrismException;

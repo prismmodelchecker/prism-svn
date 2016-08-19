@@ -93,16 +93,24 @@ public abstract class DefaultModelGenerator implements ModelGenerator
 	}
 	
 	@Override
+	public abstract List<String> getLabelNames();
+	
+	@Override
+	public int getLabelIndex(String name)
+	{
+		return getLabelNames().indexOf(name);
+	}
+
+	@Override
 	public String getLabelName(int i) throws PrismException
 	{
-		throw new PrismException("Label number \"" + i + "\" not defined");
+		try {
+			return getLabelNames().get(i);
+		} catch (IndexOutOfBoundsException e) {
+			throw new PrismException("Label number \"" + i + "\" not defined");
+		}
 	}
-	
-	public int getLabelIndex(String label)
-	{
-		return -1;
-	}
-	
+
 	@Override
 	public int getNumRewardStructs()
 	{

@@ -238,6 +238,12 @@ public class ModulesFile extends ASTElement implements ModelInfo
 	}
 
 	@Override
+	public List<String> getLabelNames()
+	{
+		return labelList.getLabelNames();
+	}
+
+	@Override
 	public String getLabelName(int i) throws PrismException
 	{
 		return labelList.getLabelName(i);

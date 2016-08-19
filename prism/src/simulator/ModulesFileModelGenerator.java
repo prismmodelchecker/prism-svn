@@ -31,6 +31,7 @@ public class ModulesFileModelGenerator extends DefaultModelGenerator
 	private Values mfConstants;
 	private VarList varList;
 	private LabelList labelList;
+	private List<String> labelNames;
 	
 	// Model exploration info
 	
@@ -94,6 +95,7 @@ public class ModulesFileModelGenerator extends DefaultModelGenerator
 		// Get info
 		varList = modulesFile.createVarList();
 		labelList = modulesFile.getLabelList();
+		labelNames = labelList.getLabelNames();
 		
 		// Create data structures for exploring model
 		updater = new Updater(modulesFile, varList, parent);
@@ -158,6 +160,12 @@ public class ModulesFileModelGenerator extends DefaultModelGenerator
 	public int getNumLabels()
 	{
 		return labelList.size();	
+	}
+
+	@Override
+	public List<String> getLabelNames()
+	{
+		return labelNames;
 	}
 	
 	@Override
