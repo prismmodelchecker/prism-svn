@@ -11,6 +11,18 @@ index bf7d91f..e5ba65f 100644
  
  // Add handling for String arrays in glp_main
  %include "various.i"
+diff --git a/swig/glpk_java.h b/swig/glpk_java.h
+index afb5b30..c6bf6b1 100644
+--- a/swig/glpk_java.h
++++ b/swig/glpk_java.h
+@@ -8,6 +8,7 @@
+ 
+ #define GLP_JAVA_MSG_LVL_OFF 0
+ #define GLP_JAVA_MSG_LVL_ALL 1
++#define EXACTLP_REQUIREMENTS 1
+ void glp_java_error(char *message);
+ void glp_java_set_msg_lvl(int msg_lvl);
+ void glp_java_set_numeric_locale(const char *locale);
 diff --git a/swig/glpk_java_arrays.i b/swig/glpk_java_arrays.i
 index 214cec7..e4ecaaa 100644
 --- a/swig/glpk_java_arrays.i

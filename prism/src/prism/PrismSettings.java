@@ -425,9 +425,6 @@ public class PrismSettings implements Observer
 
 	public static final String[] oldPropertyNames =  {"simulator.apmcStrategy", "simulator.engine", "simulator.newPathAskDefault"};
 
-	//Exact LP requirements
-	public final int EXACT_LP_REQUIREMENTS_INSTALLED = 1;
-
 	public DefaultSettingOwner[] optionOwners;
 	private Hashtable<String,Setting> data;
 	private boolean modified;

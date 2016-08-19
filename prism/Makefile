@@ -298,9 +298,9 @@ MAKE_DIRS = dd jdd odd dv prism mtbdd sparse hybrid parser settings userinterfac
 
 EXT_PACKAGES = lpsolve55 lp_solve_5.5_java
 
-EXACT_LP_PACKAGES = glpk glpk_java
+EXACTLP_PACKAGES = glpk glpk_java
 
-EXACT_LP_REQUIREMENTS_INSTALLED = 1
+EXACTLP_REQUIREMENTS_INSTALLED = 1
 
 # Find glpk_java requirements
 DETECT_SWIG = $(shell which swig 2> /dev/null)
@@ -309,16 +309,16 @@ DETECT_LIBTOOL = $(shell which libtool 2> /dev/null)
 DETECT_ACLOCAL = $(shell which aclocal 2> /dev/null)
 
 ifeq ($(DETECT_SWIG),)
-	EXACT_LP_REQUIREMENTS_INSTALLED = 0
+	EXACTLP_REQUIREMENTS_INSTALLED = 0
 endif
 ifeq ($(DETECT_MVN),)
-	EXACT_LP_REQUIREMENTS_INSTALLED = 0
+	EXACTLP_REQUIREMENTS_INSTALLED = 0
 endif
 ifeq ($(DETECT_LIBTOOL),)
-	EXACT_LP_REQUIREMENTS_INSTALLED = 0
+	EXACTLP_REQUIREMENTS_INSTALLED = 0
 endif
 ifeq ($(DETECT_ACLOCAL),)
-	EXACT_LP_REQUIREMENTS_INSTALLED = 0
+	EXACTLP_REQUIREMENTS_INSTALLED = 0
 endif
 
 .PHONY: clean javadoc tests
@@ -337,7 +337,6 @@ exact_lp_requirements: checks
 	else echo "Warning: LIBTOOL not found. Required for GLPK java bindings."; fi
 	@if [ "$(DETECT_ACLOCAL)" != "" ]; then echo "Found ACLOCAL in $(DETECT_ACLOCAL)"; \
 	else echo "Warning: ACLOCAL not found. Required for both GLPK and GLPK java bindings."; fi
-	@sed -i '/EXACT_LP_REQUIREMENTS_INSTALLED/c\	public final int EXACT_LP_REQUIREMENTS_INSTALLED = $(EXACT_LP_REQUIREMENTS_INSTALLED);' src/prism/PrismSettings.java;
 
 cuddpackage: checks
 	@if [ "$(CUDD_DIR)" = "" ]; then echo "Error: Cannot find CUDD"; exit 1; fi
@@ -396,8 +395,8 @@ extpackages: checks
 	done
 
 exact_lp: checks
-	@(if [ "$(EXACT_LP_REQUIREMENTS_INSTALLED)" = 1 ]; then \
-	  for ext in $(EXACT_LP_PACKAGES); do \
+	@(if [ "$(EXACTLP_REQUIREMENTS_INSTALLED)" = 1 ]; then \
+	  for ext in $(EXACTLP_PACKAGES); do \
            echo Making $$ext; \
            (cd ext/$$ext && \
            $(MAKE) \
@@ -597,7 +596,7 @@ clean_cudd:
 	@(cd $(CUDD_DIR) && $(MAKE) distclean)
 
 clean_ext:
-	@(for ext in $(EXT_PACKAGES) $(EXACT_LP_PACKAGES); do \
+	@(for ext in $(EXT_PACKAGES) $(EXACTLP_PACKAGES); do \
 	  echo Cleaning $$ext ...; \
 	  (cd ext/$$ext && \
 	  $(MAKE) -s LIBPREFIX="$(LIBPREFIX)" LIBSUFFIX="$(LIBSUFFIX)" clean) \
