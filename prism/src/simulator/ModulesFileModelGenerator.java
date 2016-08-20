@@ -334,23 +334,48 @@ public class ModulesFileModelGenerator extends DefaultModelGenerator
 	}
 	
 	@Override
-	public double getStateReward(int index, State state) throws PrismException
+	public double getStateReward(int r, State state) throws PrismException
 	{
-		RewardStruct rewStr = modulesFile.getRewardStruct(index);
+		RewardStruct rewStr = modulesFile.getRewardStruct(r);
 		int n = rewStr.getNumItems();
 		double d = 0;
 		for (int i = 0; i < n; i++) {
-			Expression guard = rewStr.getStates(i);
-			if (guard.evaluateBoolean(modulesFile.getConstantValues(), state)) {
-				double rew = rewStr.getReward(i).evaluateDouble(modulesFile.getConstantValues(), state);
-				if (Double.isNaN(rew))
-					throw new PrismLangException("Reward structure evaluates to NaN at state " + state, rewStr.getReward(i));
-				d += rew;
+			if (!rewStr.getRewardStructItem(i).isTransitionReward()) {
+				Expression guard = rewStr.getStates(i);
+				if (guard.evaluateBoolean(modulesFile.getConstantValues(), state)) {
+					double rew = rewStr.getReward(i).evaluateDouble(modulesFile.getConstantValues(), state);
+					if (Double.isNaN(rew))
+						throw new PrismLangException("Reward structure evaluates to NaN at state " + state, rewStr.getReward(i));
+					d += rew;
+				}
 			}
 		}
 		return d;
 	}
 
+	@Override
+	public double getStateActionReward(int r, State state, Object action) throws PrismException
+	{
+		RewardStruct rewStr = modulesFile.getRewardStruct(r);
+		int n = rewStr.getNumItems();
+		double d = 0;
+		for (int i = 0; i < n; i++) {
+			if (rewStr.getRewardStructItem(i).isTransitionReward()) {
+				Expression guard = rewStr.getStates(i);
+				String cmdAction = rewStr.getSynch(i);
+				if (action == null ? (cmdAction.isEmpty()) : action.equals(cmdAction)) {
+					if (guard.evaluateBoolean(modulesFile.getConstantValues(), state)) {
+						double rew = rewStr.getReward(i).evaluateDouble(modulesFile.getConstantValues(), state);
+						if (Double.isNaN(rew))
+							throw new PrismLangException("Reward structure evaluates to NaN at state " + state, rewStr.getReward(i));
+						d += rew;
+					}
+				}
+			}
+		}
+		return d;
+	}
+	
 	//@Override
 	public void calculateStateRewards(State state, double[] store) throws PrismLangException
 	{
