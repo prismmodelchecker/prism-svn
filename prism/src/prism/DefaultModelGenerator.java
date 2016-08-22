@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import edu.jas.util.ArrayUtil;
 import parser.State;
 import parser.Values;
 import parser.ast.RewardStruct;
@@ -221,6 +220,12 @@ public abstract class DefaultModelGenerator implements ModelGenerator
 
 	@Override
 	public double getStateReward(int index, State state) throws PrismException
+	{
+		return 0.0;
+	}
+
+	@Override
+	public double getStateActionReward(int r, State state, Object action) throws PrismException
 	{
 		return 0.0;
 	}
