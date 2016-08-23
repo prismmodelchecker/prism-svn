@@ -95,6 +95,11 @@ public class PlanTest
 			result = mc.check(mdp, propertiesFile.getProperty(0));
 			System.out.println(result.getResult());*/
 
+			// Load the adversary back in and export dot
+			prism.setEngine(Prism.HYBRID);
+			prism.loadModelFromExplicitFiles(new File("adv.sta"), new File("adv.tra"), new File("adv.lab"), ModelType.DTMC);
+			prism.exportTransToFile(true, Prism.EXPORT_DOT_STATES, new File("adv.dot"));
+			
 			// Close down
 			prism.closeDown();
 		}
