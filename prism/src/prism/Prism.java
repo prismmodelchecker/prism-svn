@@ -2670,18 +2670,6 @@ public class Prism extends PrismComponent implements PrismSettingsListener
 	 */
 	public void exportLabelsToFile(PropertiesFile propertiesFile, int exportType, File file) throws FileNotFoundException, PrismException
 	{
-		int numLabels;
-		LabelList ll;
-
-		// Get label list and size
-		if (propertiesFile == null) {
-			ll = currentModulesFile.getLabelList();
-			numLabels = ll.size();
-		} else {
-			ll = propertiesFile.getCombinedLabelList();
-			numLabels = ll.size();
-		}
-
 		// Build model, if necessary
 		buildModelIfRequired();
 
@@ -2690,12 +2678,17 @@ public class Prism extends PrismComponent implements PrismSettingsListener
 		mainLog.print(getStringForExportType(exportType) + " ");
 		mainLog.println(getDestinationStringForFile(file));
 
-		// Collect labels to export
+		// Collect names of labels to export
 		List<String> labelNames = new ArrayList<String>();
 		labelNames.add("init");
 		labelNames.add("deadlock");
-		for (int i = 0; i < numLabels; i++) {
-			labelNames.add(ll.getLabelName(i));
+		labelNames.addAll(currentModelInfo.getLabelNames());
+		if (propertiesFile != null) {
+			LabelList ll = propertiesFile.getCombinedLabelList();
+			int numLabels = ll.size();
+			for (int i = 0; i < numLabels; i++) {
+				labelNames.add(ll.getLabelName(i));
+			}
 		}
 
 		// Export
