@@ -79,6 +79,8 @@ public class PlanTest
 
 			// Build the same model through the PRISM API
 			prism.loadModelGenerator(mdpGen);
+			prism.exportStatesToFile(Prism.EXPORT_PLAIN, new File("adv.sta"));
+			prism.exportLabelsToFile(null, Prism.EXPORT_PLAIN, new File("adv.lab"));
 			prism.exportTransToFile(true, Prism.EXPORT_DOT_STATES, new File("mdp.dot"));
 			prism.setExportAdv(Prism.EXPORT_ADV_MDP);
 			prism.setExportAdvFilename("adv.tra");
