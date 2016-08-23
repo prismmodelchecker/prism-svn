@@ -30,6 +30,7 @@ package prism;
 import java.util.List;
 
 import parser.Values;
+import parser.VarList;
 import parser.ast.RewardStruct;
 import parser.type.Type;
 
@@ -137,4 +138,7 @@ public interface ModelInfo
 	 * Returns null if index is out of range.
 	 */
 	public RewardStruct getRewardStruct(int i);
+	
+	// TODO: can we remove this?
+	public VarList createVarList() throws PrismException;
 }
