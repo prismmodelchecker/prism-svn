@@ -82,6 +82,7 @@ public class PlanTest
 			prism.exportStatesToFile(Prism.EXPORT_PLAIN, new File("adv.sta"));
 			prism.exportLabelsToFile(null, Prism.EXPORT_PLAIN, new File("adv.lab"));
 			prism.exportTransToFile(true, Prism.EXPORT_DOT_STATES, new File("mdp.dot"));
+			//prism.exportStateRewardsToFile(Prism.EXPORT_PLAIN, new File("adv.srew"));
 			prism.setExportAdv(Prism.EXPORT_ADV_MDP);
 			prism.setExportAdvFilename("adv.tra");
 			//propertiesFile = prism.parsePropertiesString(mdpGen, "Pmax=?[F \"target\"]");
@@ -97,7 +98,7 @@ public class PlanTest
 
 			// Load the adversary back in and export dot
 			prism.setEngine(Prism.HYBRID);
-			prism.loadModelFromExplicitFiles(new File("adv.sta"), new File("adv.tra"), new File("adv.lab"), ModelType.DTMC);
+			prism.loadModelFromExplicitFiles(new File("adv.sta"), new File("adv.tra"), new File("adv.lab"), null, ModelType.DTMC);
 			prism.exportTransToFile(true, Prism.EXPORT_DOT_STATES, new File("adv.dot"));
 			
 			// Close down
