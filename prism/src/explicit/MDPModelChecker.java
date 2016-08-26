@@ -123,7 +123,8 @@ public class MDPModelChecker extends ProbModelChecker
 		mainLog.println("\nComputing reachability probabilities...");
 		mcProduct = new MDPModelChecker(this);
 		mcProduct.inheritSettings(this);
-		probsProduct = StateValues.createFromDoubleArray(mcProduct.computeReachProbs((MDP)product.getProductModel(), acc, false).soln, product.getProductModel());
+		ModelCheckerResult res = mcProduct.computeReachProbs((MDP) product.getProductModel(), acc, false);
+		probsProduct = StateValues.createFromDoubleArray(res.soln, product.getProductModel());
 
 		// Subtract from 1 if we're model checking a negated formula for regular Pmin
 		if (minMax.isMin()) {
@@ -202,7 +203,8 @@ public class MDPModelChecker extends ProbModelChecker
 		mainLog.println("\nComputing reachability rewards...");
 		mcProduct = new MDPModelChecker(this);
 		mcProduct.inheritSettings(this);
-		rewardsProduct = StateValues.createFromDoubleArray(mcProduct.computeReachRewards(product.getProductModel(), productRewards, acc, minMax.isMin()).soln, product.getProductModel());
+		ModelCheckerResult res = mcProduct.computeReachRewards(product.getProductModel(), productRewards, acc, minMax.isMin());
+		rewardsProduct = StateValues.createFromDoubleArray(res.soln, product.getProductModel());
 		
 		// Output vector over product, if required
 		if (getExportProductVector()) {
@@ -1752,8 +1754,9 @@ public class MDPModelChecker extends ProbModelChecker
 			mc = new MDPModelChecker(null);
 			mdp = new MDPSimple();
 			mdp.buildFromPrismExplicit(args[0]);
+			mdp.addInitialState(0);
 			//System.out.println(mdp);
-			labels = mc.loadLabelsFile(args[1]);
+			labels = StateModelChecker.loadLabelsFile(args[1]);
 			//System.out.println(labels);
 			init = labels.get("init");
 			target = labels.get(args[2]);

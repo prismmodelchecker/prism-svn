@@ -39,6 +39,7 @@ import explicit.CTMCModelChecker;
 import explicit.ConstructModel;
 import explicit.DTMC;
 import explicit.DTMCModelChecker;
+import explicit.ExplicitFiles2Model;
 import explicit.FastAdaptiveUniformisation;
 import explicit.FastAdaptiveUniformisationModelChecker;
 import hybrid.PrismHybrid;
@@ -195,6 +196,8 @@ public class Prism extends PrismComponent implements PrismSettingsListener
 	protected boolean storeVector = false;
 	// Generate/store a strategy during model checking?
 	protected boolean genStrat = false;
+	// Should any generated strategies should be restricted to the states reachable under them?
+	protected boolean restrictStratToReach = false;
 	// Do bisimulation minimisation before model checking?
 	protected boolean doBisim = false;
 
@@ -266,6 +269,7 @@ public class Prism extends PrismComponent implements PrismSettingsListener
 	private File explicitFilesStatesFile = null;
 	private File explicitFilesTransFile = null;
 	private File explicitFilesLabelsFile = null;
+	private File explicitFilesStateRewardsFile = null;
 	private int explicitFilesNumStates = -1;
 
 	// Has the CUDD library been initialised yet?
@@ -597,6 +601,14 @@ public class Prism extends PrismComponent implements PrismSettingsListener
 	}
 
 	/**
+	 * Specify whether or not any generated strategies should be restricted to the states reachable under them.
+	 */
+	public void setRestrictStratToReach(boolean restrictStratToReach)
+	{
+		this.restrictStratToReach = restrictStratToReach;
+	}
+
+	/**
 	 * Specify whether or not to do bisimulation minimisation before model checking.
 	 */
 	public void setDoBisim(boolean doBisim)
@@ -646,6 +658,15 @@ public class Prism extends PrismComponent implements PrismSettingsListener
 	public static String getToolName()
 	{
 		return "PRISM";
+	}
+
+	/**
+	 * Get the name of the command-line version of this tool.
+	 * ("prism" by default, extensions might override) 
+	 */
+	public static String getCommandLineName()
+	{
+		return "prism";
 	}
 
 	/**
@@ -919,6 +940,14 @@ public class Prism extends PrismComponent implements PrismSettingsListener
 	public boolean getGenStrat()
 	{
 		return genStrat;
+	}
+
+	/**
+	 * Whether or not any generated strategies should be restricted to the states reachable under them.
+	 */
+	public boolean getRestrictStratToReach()
+	{
+		return restrictStratToReach;
 	}
 
 	/**
@@ -1802,20 +1831,22 @@ public class Prism extends PrismComponent implements PrismSettingsListener
 	 * @param statesFile File containing a list of states (optional, can be null)
 	 * @param transFile File containing the list of transitions (required)
 	 * @param labelsFile File containing label definitions (optional, can be null)
+	 * @param stateRewardsFile File containing state reward definitions (optional, can be null)
 	 * @param typeOverride Type of model to be built (optional, use null if not required)
 	 */
-	public ModulesFile loadModelFromExplicitFiles(File statesFile, File transFile, File labelsFile, ModelType typeOverride) throws PrismException
+	public ModulesFile loadModelFromExplicitFiles(File statesFile, File transFile, File labelsFile, File stateRewardsFile, ModelType typeOverride) throws PrismException
 	{
 		currentModelSource = ModelSource.EXPLICIT_FILES;
 		// Clear any existing built model(s)
 		clearBuiltModel();
 		// Construct ModulesFile
 		ExplicitFiles2ModulesFile ef2mf = new ExplicitFiles2ModulesFile(this);
-		currentModulesFile = ef2mf.buildModulesFile(statesFile, transFile, typeOverride);
+		currentModulesFile = ef2mf.buildModulesFile(statesFile, transFile, labelsFile, typeOverride);
 		// Store explicit files info for later
 		explicitFilesStatesFile = statesFile;
 		explicitFilesTransFile = transFile;
 		explicitFilesLabelsFile = labelsFile;
+		explicitFilesStateRewardsFile = stateRewardsFile;
 		explicitFilesNumStates = ef2mf.getNumStates();
 		// Reset dependent info
 		currentModelType = currentModulesFile == null ? null : currentModulesFile.getModelType();
@@ -1963,10 +1994,10 @@ public class Prism extends PrismComponent implements PrismSettingsListener
 			case EXPLICIT_FILES:
 				if (!getExplicit()) {
 					expf2mtbdd = new ExplicitFiles2MTBDD(this);
-					currentModel = expf2mtbdd.build(explicitFilesStatesFile, explicitFilesTransFile, explicitFilesLabelsFile, currentModulesFile,
-							explicitFilesNumStates);
+					currentModel = expf2mtbdd.build(explicitFilesStatesFile, explicitFilesTransFile, explicitFilesLabelsFile, explicitFilesStateRewardsFile,
+							currentModulesFile, explicitFilesNumStates);
 				} else {
-					throw new PrismNotSupportedException("Explicit import not yet supported for explicit engine");
+					currentModelExpl = new ExplicitFiles2Model(this).build(explicitFilesStatesFile, explicitFilesTransFile, explicitFilesLabelsFile, currentModulesFile, explicitFilesNumStates);
 				}
 				break;
 			default:
