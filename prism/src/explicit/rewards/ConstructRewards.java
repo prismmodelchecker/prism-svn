@@ -236,7 +236,12 @@ public class ConstructRewards
 		for (int j = 0; j < numStates; j++) {
 			State state = statesList.get(j);
 			// State rewards
-			rewSA.addToStateReward(j, modelGen.getStateReward(r, state));
+			double rew = modelGen.getStateReward(r, state);
+			if (Double.isNaN(rew))
+				throw new PrismException("Reward structure evaluates to NaN at state " + state);
+			if (!allowNegative && rew < 0)
+				throw new PrismException("Reward structure evaluates to " + rew + " at state " + state +", negative rewards not allowed");
+			rewSA.addToStateReward(j, rew);
 		}
 		return rewSA;
 	}
@@ -255,11 +260,21 @@ public class ConstructRewards
 		for (int j = 0; j < numStates; j++) {
 			State state = statesList.get(j);
 			// State rewards
-			rewSimple.addToStateReward(j, modelGen.getStateReward(r, state));
+			double rew = modelGen.getStateReward(r, state);
+			if (Double.isNaN(rew))
+				throw new PrismException("Reward structure evaluates to NaN at state " + state);
+			if (!allowNegative && rew < 0)
+				throw new PrismException("Reward structure evaluates to " + rew + " at state " + state +", negative rewards not allowed");
+			rewSimple.addToStateReward(j, rew);
 			// State-action rewards
 			int numChoices = mdp.getNumChoices(j);
 			for (int k = 0; k < numChoices; k++) {
-				rewSimple.addToTransitionReward(j, k, modelGen.getStateActionReward(r, state, mdp.getAction(j, k)));
+				rew = modelGen.getStateActionReward(r, state, mdp.getAction(j, k));
+				if (Double.isNaN(rew))
+					throw new PrismException("Reward structure evaluates to NaN at state " + state);
+				if (!allowNegative && rew < 0)
+					throw new PrismException("Reward structure evaluates to " + rew + " at state " + state +", negative rewards not allowed");
+				rewSimple.addToTransitionReward(j, k, rew);
 			}
 		}
 		return rewSimple;
