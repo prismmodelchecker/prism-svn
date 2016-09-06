@@ -1982,14 +1982,15 @@ public class Prism extends PrismComponent implements PrismSettingsListener
 				if (currentModelGenerator == null)
 					throw new PrismException("There is no currently loaded model generator to build");
 				if (!getExplicit()) {
-					mainLog.printWarning("Switching to explicit engine to use model generator");
-					setEngine(Prism.EXPLICIT);
+					ModelGenerator2MTBDD modelGen2mtbdd = new ModelGenerator2MTBDD(this);
+					currentModel = modelGen2mtbdd.build(currentModelGenerator);
+					currentModelExpl = null;
+				} else {
+					ConstructModel constructModel = new ConstructModel(this);
+					constructModel.setFixDeadlocks(getFixDeadlocks());
+					currentModelExpl = constructModel.constructModel(currentModelGenerator);
+					currentModel = null;
 				}
-				ConstructModel constructModel = new ConstructModel(this);
-				constructModel.setFixDeadlocks(getFixDeadlocks());
-				currentModelExpl = constructModel.constructModel(currentModelGenerator);
-				currentModel = null;
-				// if (...) ... currentModel = buildModelExplicit(currentModulesFile);
 				break;
 			case EXPLICIT_FILES:
 				if (!getExplicit()) {
