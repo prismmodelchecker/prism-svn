@@ -3,21 +3,27 @@ package simulator;
 import java.util.ArrayList;
 import java.util.List;
 
+import param.Function;
+import param.FunctionFactory;
+import param.ModelBuilder;
+import param.SymbolicEngine;
 import parser.State;
 import parser.Values;
 import parser.VarList;
+import parser.ast.ConstantList;
 import parser.ast.Expression;
 import parser.ast.LabelList;
 import parser.ast.ModulesFile;
 import parser.ast.RewardStruct;
 import parser.type.Type;
 import prism.DefaultModelGenerator;
+import prism.ModelGeneratorSymbolic;
 import prism.ModelType;
 import prism.PrismComponent;
 import prism.PrismException;
 import prism.PrismLangException;
 
-public class ModulesFileModelGenerator extends DefaultModelGenerator
+public class ModulesFileModelGeneratorSymbolic extends DefaultModelGenerator implements ModelGeneratorSymbolic
 {
 	// Parent PrismComponent (logs, settings etc.)
 	protected PrismComponent parent;
@@ -38,17 +44,23 @@ public class ModulesFileModelGenerator extends DefaultModelGenerator
 	// State currently being explored
 	private State exploreState;
 	// Updater object for model
-	protected Updater updater;
+	//protected Updater updater;
+	protected SymbolicEngine engine;
 	// List of currently available transitions
-	protected TransitionList transitionList;
+	protected param.TransitionList transitionList;
 	// Has the transition list been built? 
 	protected boolean transitionListBuilt;
+	
+	// Symbolic stuff
+	boolean symbolic = false;
+	protected ModelBuilder modelBuilder;
+	protected FunctionFactory functionFactory;
 	
 	/**
 	 * Build a ModulesFileModelGenerator for a particular PRISM model, represented by a ModuleFile instance.
 	 * @param modulesFile The PRISM model
 	 */
-	public ModulesFileModelGenerator(ModulesFile modulesFile) throws PrismException
+	public ModulesFileModelGeneratorSymbolic(ModulesFile modulesFile) throws PrismException
 	{
 		this(modulesFile, null);
 	}
@@ -57,7 +69,7 @@ public class ModulesFileModelGenerator extends DefaultModelGenerator
 	 * Build a ModulesFileModelGenerator for a particular PRISM model, represented by a ModuleFile instance.
 	 * @param modulesFile The PRISM model
 	 */
-	public ModulesFileModelGenerator(ModulesFile modulesFile, PrismComponent parent) throws PrismException
+	public ModulesFileModelGeneratorSymbolic(ModulesFile modulesFile, PrismComponent parent) throws PrismException
 	{
 		this.parent = parent;
 		
@@ -89,8 +101,9 @@ public class ModulesFileModelGenerator extends DefaultModelGenerator
 	 */
 	private void initialise() throws PrismLangException
 	{
-		// Evaluate constants on (a copy) of the modules file, insert constant values and optimize arithmetic expressions
-		modulesFile = (ModulesFile) modulesFile.deepCopy().replaceConstants(mfConstants).simplify();
+		// Evaluate constants on (a copy) of the modules file, insert constant values
+		// Note that we don't optimise expressions since this can create some round-off issues
+		modulesFile = (ModulesFile) modulesFile.deepCopy().replaceConstants(mfConstants);
 
 		// Get info
 		varList = modulesFile.createVarList();
@@ -98,9 +111,21 @@ public class ModulesFileModelGenerator extends DefaultModelGenerator
 		labelNames = labelList.getLabelNames();
 		
 		// Create data structures for exploring model
-		updater = new Updater(modulesFile, varList, parent);
-		transitionList = new TransitionList();
+		//updater = new Updater(modulesFile, varList, parent);
+		//transitionList = new TransitionList();
+		engine = new SymbolicEngine(modulesFile, modelBuilder, functionFactory);
 		transitionListBuilt = false;
+	}
+	
+	@Override
+	public void setSymbolic(ModelBuilder modelBuilder, FunctionFactory functionFactory)
+	{
+		symbolic = true;
+		this.modelBuilder = modelBuilder;
+		this.functionFactory = functionFactory;
+		//updater.setSymbolic(modelBuilder, functionFactory);
+		// TODO: created twice
+		engine = new SymbolicEngine(modulesFile, modelBuilder, functionFactory);
 	}
 	
 	// Methods for ModelInfo interface
@@ -287,7 +312,7 @@ public class ModulesFileModelGenerator extends DefaultModelGenerator
 	@Override
 	public String getTransitionAction(int index, int offset) throws PrismException
 	{
-		TransitionList transitions = getTransitionList();
+		param.TransitionList transitions = getTransitionList();
 		int a = transitions.getTransitionModuleOrActionIndex(transitions.getTotalIndexOfTransition(index, offset));
 		return a < 0 ? null : modulesFile.getSynch(a - 1);
 	}
@@ -295,7 +320,7 @@ public class ModulesFileModelGenerator extends DefaultModelGenerator
 	@Override
 	public String getChoiceAction(int index) throws PrismException
 	{
-		TransitionList transitions = getTransitionList();
+		param.TransitionList transitions = getTransitionList();
 		int a = transitions.getChoiceModuleOrActionIndex(index);
 		return a < 0 ? null : modulesFile.getSynch(a - 1);
 	}
@@ -303,15 +328,24 @@ public class ModulesFileModelGenerator extends DefaultModelGenerator
 	@Override
 	public double getTransitionProbability(int index, int offset) throws PrismException
 	{
-		TransitionList transitions = getTransitionList();
-		return transitions.getChoice(index).getProbability(offset);
+		throw new UnsupportedOperationException();
+		/*param.TransitionList transitions = getTransitionList();
+		return transitions.getChoice(index).getProbability(offset);*/
 	}
 
 	//@Override
 	public double getTransitionProbability(int index) throws PrismException
 	{
-		TransitionList transitions = getTransitionList();
-		return transitions.getTransitionProbability(index);
+		throw new UnsupportedOperationException();
+		/*param.TransitionList transitions = getTransitionList();
+		return transitions.getTransitionProbability(index);*/
+	}
+
+	@Override
+	public Function getTransitionProbabilityFunction(int index, int offset) throws PrismException
+	{
+		param.TransitionList transitions = getTransitionList();
+		return transitions.getChoice(index).getProbability(offset);
 	}
 
 	@Override
@@ -379,7 +413,7 @@ public class ModulesFileModelGenerator extends DefaultModelGenerator
 	//@Override
 	public void calculateStateRewards(State state, double[] store) throws PrismLangException
 	{
-		updater.calculateStateRewards(state, store);
+		// TODO updater.calculateStateRewards(state, store);
 	}
 	
 	@Override
@@ -405,14 +439,28 @@ public class ModulesFileModelGenerator extends DefaultModelGenerator
 	/**
 	 * Returns the current list of available transitions, generating it first if this has not yet been done.
 	 */
-	private TransitionList getTransitionList() throws PrismException
+	private param.TransitionList getTransitionList() throws PrismException
 	{
 		// Compute the current transition list, if required
 		if (!transitionListBuilt) {
-			updater.calculateTransitions(exploreState, transitionList);
+			//updater.calculateTransitions(exploreState, transitionList);
+			transitionList = engine.calculateTransitions(exploreState, true);
 			transitionListBuilt = true;
 		}
 		return transitionList;
+	}
+
+	// ModelGeneratorSymbolic
+	
+	@Override
+	public Expression getUnknownConstantDefinition(String name) throws PrismException
+	{
+		ConstantList constantList = modulesFile.getConstantList();
+		int i = constantList.getConstantIndex(name);
+		if (i == -1) {
+			throw new PrismException("Unknown constant " + name);
+		}
+		return constantList.getConstant(i);
 	}
 
 	@Override
