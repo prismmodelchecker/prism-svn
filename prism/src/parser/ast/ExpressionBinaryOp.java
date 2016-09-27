@@ -192,19 +192,19 @@ public class ExpressionBinaryOp extends Expression
 			}
 		case PLUS:
 			if (operand1.getType() == TypeInt.getInstance() && operand2.getType() == TypeInt.getInstance()) {
-				return new Integer(operand1.evaluateInt(ec) + operand2.evaluateInt(ec));
+				return operand1.evaluateInt(ec) + operand2.evaluateInt(ec);
 			} else {
 				return new Double(operand1.evaluateDouble(ec) + operand2.evaluateDouble(ec));
 			}
 		case MINUS:
 			if (operand1.getType() == TypeInt.getInstance() && operand2.getType() == TypeInt.getInstance()) {
-				return new Integer(operand1.evaluateInt(ec) - operand2.evaluateInt(ec));
+				return operand1.evaluateInt(ec) - operand2.evaluateInt(ec);
 			} else {
 				return new Double(operand1.evaluateDouble(ec) - operand2.evaluateDouble(ec));
 			}
 		case TIMES:
 			if (operand1.getType() == TypeInt.getInstance() && operand2.getType() == TypeInt.getInstance()) {
-				return new Integer(operand1.evaluateInt(ec) * operand2.evaluateInt(ec));
+				return operand1.evaluateInt(ec) * operand2.evaluateInt(ec);
 			} else {
 				return new Double(operand1.evaluateDouble(ec) * operand2.evaluateDouble(ec));
 			}

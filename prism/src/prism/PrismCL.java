@@ -1106,7 +1106,7 @@ public class PrismCL implements PrismModelListener
 				else if (sw.equals("prop") || sw.equals("property")) {
 					if (i < args.length - 1) {
 						try {
-							propertyToCheck = Integer.parseInt(args[++i]);
+							propertyToCheck = Integer.valueOf(args[++i]);
 						} catch (NumberFormatException e) {
 							propertyToCheck = args[i];
 						}

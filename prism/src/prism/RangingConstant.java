@@ -82,7 +82,7 @@ public class RangingConstant
      */
     public Object getValue(int i)
     {
-	return new Integer(1); //dummy dummy dummy
+    	return 1; //dummy dummy dummy
     }
     
 }

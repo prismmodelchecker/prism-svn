@@ -84,7 +84,7 @@ public class GUISimulatorDistributionDialog extends javax.swing.JDialog implemen
 		SummaryEditorKit kit = new SummaryEditorKit();
 		summaryText.setEditorKitForContentType("text/summary", kit);
 		summaryText.setContentType("text/summary");
-		summaryText.getDocument().putProperty( PlainDocument.tabSizeAttribute, new Integer(2) );
+		summaryText.getDocument().putProperty( PlainDocument.tabSizeAttribute, 2 );
 		summaryText.setSelectionColor(Color.white);
 		summaryText.setEnabled(false);
 		

@@ -360,7 +360,7 @@ public class StateListMTBDD implements StateList
 			}
 			v += varList.getLow(i);
 			if (varList.getType(i) instanceof TypeInt) {
-				o = new Integer(v);
+				o = v;
 			} else {
 				o = new Boolean(v == 1);
 			}

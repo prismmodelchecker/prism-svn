@@ -213,7 +213,7 @@ public class GUILog extends GUIPlugin implements MouseListener, PrismSettingsLis
 			}
 		};
 		clearAction.putValue(Action.SHORT_DESCRIPTION, "Clear log");
-		clearAction.putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_C));
+		clearAction.putValue(Action.MNEMONIC_KEY, KeyEvent.VK_C);
 		clearAction.putValue(Action.NAME, "Clear log");
 		clearAction.putValue(Action.SMALL_ICON, GUIPrism.getIconFromImage("smallDelete.png"));
 		
@@ -240,7 +240,7 @@ public class GUILog extends GUIPlugin implements MouseListener, PrismSettingsLis
 			}
 		};
 		saveAction.putValue(Action.SHORT_DESCRIPTION, "Save log as...");
-		saveAction.putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_S));
+		saveAction.putValue(Action.MNEMONIC_KEY, KeyEvent.VK_S);
 		saveAction.putValue(Action.NAME, "Save log as...");
 		saveAction.putValue(Action.SMALL_ICON, GUIPrism.getIconFromImage("smallSave.png"));
 		

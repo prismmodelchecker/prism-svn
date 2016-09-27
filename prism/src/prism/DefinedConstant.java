@@ -150,9 +150,9 @@ public class DefinedConstant
 		// store 'actual' value for high
 		ih = ihNew;
 		// store Object versions
-		low = new Integer(il);
-		high = new Integer(ih);
-		step = new Integer(is);
+		low = il;
+		high = ih;
+		step = is;
 	}
 	
 	public void defineDouble(String sl, String sh, String ss) throws PrismException
@@ -251,7 +251,7 @@ public class DefinedConstant
 			iv = ((Integer)value).intValue();
 			// if possible, increment
 			if (iv+is<=ih) {
-				value = new Integer(iv+is);
+				value = iv+is;
 			}
 			// otherwise, reset to low value, note overflow
 			else {
@@ -311,7 +311,7 @@ public class DefinedConstant
 			is = ((Integer)step).intValue();
 			iv = il;
 			for (i = 0; i < j; i++) iv += is;
-			return new Integer(iv);
+			return iv;
 		}
 		// double
 		else if (type instanceof TypeDouble) {

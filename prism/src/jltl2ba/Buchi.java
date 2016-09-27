@@ -731,7 +731,7 @@ public class Buchi {
 		for (s = bstates.prv; s != bstates; s = s.prv) {
 			stateindex = nba.nba_i_newState();
 			// System.out.println("Seen ltl2ba state " + s.id + ", mapped to " + stateindex);
-			map.put(new LTL2BAState(s.id, s._final), new Integer(stateindex));
+			map.put(new LTL2BAState(s.id, s._final), stateindex);
 			
 			if (s.id == -1)
 				nba.nba_i_setStartState(stateindex);

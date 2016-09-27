@@ -55,7 +55,7 @@ public class TypeInt extends Type
 	@Override
 	public Object defaultValue()
 	{
-		return new Integer(0);
+		return 0;
 	}
 	
 	public static TypeInt getInstance()

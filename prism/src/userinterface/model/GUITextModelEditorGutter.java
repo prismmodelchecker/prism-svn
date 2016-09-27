@@ -185,7 +185,7 @@ public class GUITextModelEditorGutter extends JPanel implements PropertyChangeLi
 			
 			if (errorMessages != null)
 			{
-				if (errorMessages.containsKey(new Integer(i+1)))
+				if (errorMessages.containsKey(i+1))
 					isErrorLine = true;
 			}
 			

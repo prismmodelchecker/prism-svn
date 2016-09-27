@@ -623,7 +623,7 @@ public class SettingTable extends JPanel implements ListSelectionListener, Table
 					currGroupCount++;
 					if(!po.getSettingOwnerName().equals(""))ownerList += "\'"+po.getSettingOwnerName()+"\'";
 					tempName = po.getSettingOwnerClassName();
-					groupStarts.add(new Integer(0));
+					groupStarts.add(0);
 				}
 				else if(po.getSettingOwnerID() == last.getSettingOwnerID())
 				{
@@ -640,12 +640,12 @@ public class SettingTable extends JPanel implements ListSelectionListener, Table
 					tempName+=" "+ownerList+"";
 					ownerList = "";
 					groupNames.add(tempName);
-					groupSizes.add(new Integer(currGroupCount));
+					groupSizes.add(currGroupCount);
 					currGroupCount = 0;
 					currGroupCount++;
 					ownerList += "\'"+po.getSettingOwnerName()+"\'";
 					if(!po.getSettingOwnerName().equals(""))tempName = po.getSettingOwnerClassName()+" \'"+po.getSettingOwnerName()+"\'";
-					groupStarts.add(new Integer(index));
+					groupStarts.add(index);
 				}
 				last = po;
 				index++;
@@ -654,7 +654,7 @@ public class SettingTable extends JPanel implements ListSelectionListener, Table
 			{
 				tempName += " "+ownerList+"";
 				groupNames.add(tempName);
-				groupSizes.add(new Integer(currGroupCount));
+				groupSizes.add(currGroupCount);
 			}
 			if(currentGroup > owners.size()-1) currentGroup = 0;
 			comboModel = new DefaultComboBoxModel(groupNames.toArray());

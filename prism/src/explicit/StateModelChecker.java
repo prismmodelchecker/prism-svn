@@ -1006,7 +1006,7 @@ public class StateModelChecker extends PrismComponent
 			// Compute count
 			int count = vals.countOverBitSet(bsFilter);
 			// Store as object/vector
-			resObj = new Integer(count);
+			resObj = count;
 			resVals = new StateValues(expr.getType(), resObj, model);
 			// Create explanation of result and print some details to log
 			resultExpl = filterTrue ? "Count of satisfying states" : "Count of satisfying states also in filter";

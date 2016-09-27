@@ -123,7 +123,7 @@ public class ExpressionUnaryOp extends Expression
 			return new Boolean(!operand.evaluateBoolean(ec));
 		case MINUS:
 			if (type instanceof TypeInt) {
-				return new Integer(-operand.evaluateInt(ec));
+				return -operand.evaluateInt(ec);
 			} else {
 				return new Double(-operand.evaluateDouble(ec));
 			}
