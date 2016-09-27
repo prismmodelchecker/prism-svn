@@ -148,7 +148,7 @@ public abstract class APMCMethod extends SimulationMethod
 		double estimate = sampler.getMeanValue();
 		switch (prOp) {
 		case 0: // 0=quantitative
-			return new Double(estimate);
+			return estimate;
 		case -1: // -1=lower bound
 			if (estimate >= theta + approximation)
 				return true;

@@ -37,7 +37,7 @@ public class DoubleProperty extends SingleProperty
     
     public DoubleProperty(PropertyOwner owner,String name, double property, String comment)
     {
-        super(owner,name, new Double(property), "", false, comment);
+        super(owner,name, property, "", false, comment);
     }
     
     public void setValue(double property)
@@ -49,7 +49,7 @@ public class DoubleProperty extends SingleProperty
     {
         try
         {
-            setProperty(new Double(property), notifyObservers);
+            setProperty(property, notifyObservers);
         }
         catch(PropertyException e)
         {
@@ -59,7 +59,7 @@ public class DoubleProperty extends SingleProperty
     
     public double getValue()
     {
-        return ((Double)getProperty()).doubleValue();
+        return (Double) getProperty();
     }
     
     public void setProperty(Object property) throws PropertyException
@@ -76,7 +76,7 @@ public class DoubleProperty extends SingleProperty
             try
             {
             
-                super.setProperty(new Double(Double.parseDouble((String)property)), notifyObservers);
+                super.setProperty(Double.valueOf((String)property), notifyObservers);
                 return;
             }
             catch(NumberFormatException e)

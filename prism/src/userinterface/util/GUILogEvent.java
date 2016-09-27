@@ -50,7 +50,7 @@ public class GUILogEvent extends GUIEvent
     
     public GUILogEvent(int type, double message)
     {
-        super(type, new Double(message));
+        super(type, message);
     }
     
     public GUILogEvent(int type, float message)
@@ -90,7 +90,7 @@ public class GUILogEvent extends GUIEvent
     
     public GUILogEvent(double message)
     {
-        this(PRINTLN, new Double(message));
+        this(PRINTLN, message);
     }
     
     public GUILogEvent(float message)

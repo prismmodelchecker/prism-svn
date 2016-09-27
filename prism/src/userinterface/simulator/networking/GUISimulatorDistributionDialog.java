@@ -144,7 +144,7 @@ public class GUISimulatorDistributionDialog extends javax.swing.JDialog implemen
 					Values mcs = undefinedConstants.getMFConstantValues();
 					Values pcs = (Values)propertyValues.get(i);
 					double res = resultsFile.getResult(i);
-					Object result = (res < 0.0)?null:new Double(res);
+					Object result = (res < 0.0) ? null : res;
 					rc.setResult(mcs, pcs, result);
 					
 				}

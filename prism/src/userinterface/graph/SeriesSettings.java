@@ -156,7 +156,7 @@ public class SeriesSettings extends Observable implements SettingOwner
         String[] choices = { "Circle", "Square", "Triangle", "Horizontal Rectangle", "Vertical Rectangle", "None" };
         seriesShape = new ChoiceSetting("point shape", choices, choices[0], "The shape of points for this series.", this, true);
         showLines = new BooleanSetting("show lines", true, "Should lines be displayed for this series?", this, true);
-        lineWidth = new DoubleSetting("line width",  new Double(1.0), "The line width for this series.", this, true, new RangeConstraint("0.0,"));
+        lineWidth = new DoubleSetting("line width",  1.0, "The line width for this series.", this, true, new RangeConstraint("0.0,"));
         String [] styles = { "---------", "- - - - -", "- -- - --" };
         lineStyle = new ChoiceSetting("line style", styles, styles[0], "The line style for this series.", this, true);
         
@@ -446,10 +446,10 @@ public class SeriesSettings extends Observable implements SettingOwner
 	 */
 	public void setLineWidth(double value) throws SettingException
 	{
-		lineWidth.setValue(new Double(value));
+		lineWidth.setValue(value);
 		updateSeries();
 		setChanged();
-		notifyObservers();					
+		notifyObservers();
 	}
 	
 	/**

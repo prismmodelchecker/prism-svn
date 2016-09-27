@@ -208,9 +208,9 @@ public class DefinedConstant
 		// store 'actual' value for high
 		dh = dhNew;
 		// store Object versions
-		low = new Double(dl);
-		high = new Double(dh);
-		step = new Double(ds);
+		low = dl;
+		high = dh;
+		step = ds;
 	}
 	
 	public void defineBoolean(String sl, String sh, String ss) throws PrismException
@@ -269,7 +269,7 @@ public class DefinedConstant
 			int index = getValueIndex(value) + 1;			
 			dv = dl + index * ds; 
 			if (dv <= dh + DOUBLE_PRECISION_CORRECTION * ds) {
-				value = new Double(dv);
+				value = dv;
 			}
 			// otherwise, reset to low value, note overflow
 			else {
@@ -320,7 +320,7 @@ public class DefinedConstant
 			dv = dl;
 			//for (i = 0; i < j; i++) dv += ds;			
 			dv = dl + j * ds;
-			return new Double(dv);
+			return dv;
 		} 
 		// boolean (case should be redundant)
 		else if (type instanceof TypeBool) { 

@@ -194,22 +194,22 @@ public class ExpressionBinaryOp extends Expression
 			if (operand1.getType() == TypeInt.getInstance() && operand2.getType() == TypeInt.getInstance()) {
 				return operand1.evaluateInt(ec) + operand2.evaluateInt(ec);
 			} else {
-				return new Double(operand1.evaluateDouble(ec) + operand2.evaluateDouble(ec));
+				return operand1.evaluateDouble(ec) + operand2.evaluateDouble(ec);
 			}
 		case MINUS:
 			if (operand1.getType() == TypeInt.getInstance() && operand2.getType() == TypeInt.getInstance()) {
 				return operand1.evaluateInt(ec) - operand2.evaluateInt(ec);
 			} else {
-				return new Double(operand1.evaluateDouble(ec) - operand2.evaluateDouble(ec));
+				return operand1.evaluateDouble(ec) - operand2.evaluateDouble(ec);
 			}
 		case TIMES:
 			if (operand1.getType() == TypeInt.getInstance() && operand2.getType() == TypeInt.getInstance()) {
 				return operand1.evaluateInt(ec) * operand2.evaluateInt(ec);
 			} else {
-				return new Double(operand1.evaluateDouble(ec) * operand2.evaluateDouble(ec));
+				return operand1.evaluateDouble(ec) * operand2.evaluateDouble(ec);
 			}
 		case DIVIDE:
-			return new Double(operand1.evaluateDouble(ec) / operand2.evaluateDouble(ec));
+			return operand1.evaluateDouble(ec) / operand2.evaluateDouble(ec);
 		}
 		throw new PrismLangException("Unknown binary operator", this);
 	}

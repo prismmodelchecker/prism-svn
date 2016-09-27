@@ -354,7 +354,7 @@ public class SeriesEditorDialog extends JDialog
 					
 					try
 					{
-						value = Double.parseDouble(aValue.toString());
+						value = Double.valueOf(aValue.toString());
 					}
 					catch (NumberFormatException e) 
 					{
@@ -389,9 +389,9 @@ public class SeriesEditorDialog extends JDialog
 								clearBufferRow(bufferIndex);
 								
 								if (columnIndex == 0)
-									SeriesEditor.this.xySeries.addOrUpdate(new Double(value), otherBufferValue);
+									SeriesEditor.this.xySeries.addOrUpdate(value, otherBufferValue);
 								else
-									SeriesEditor.this.xySeries.addOrUpdate(otherBufferValue, new Double(value));
+									SeriesEditor.this.xySeries.addOrUpdate(otherBufferValue, value);
 							}
 						}
 					}
@@ -418,7 +418,7 @@ public class SeriesEditorDialog extends JDialog
 							
 							Double yValue = SeriesEditor.this.xySeries.getY(rowIndex).doubleValue();
 							SeriesEditor.this.xySeries.remove(rowIndex);
-							SeriesEditor.this.xySeries.addOrUpdate(new Double(value), yValue);							
+							SeriesEditor.this.xySeries.addOrUpdate(value, yValue);
 						}
 											
 						else

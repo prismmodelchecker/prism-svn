@@ -234,7 +234,7 @@ public class ExpressionFunc extends Expression
 				d = getOperand(i).evaluateDouble(ec);
 				dMin = (d < dMin) ? d : dMin;
 			}
-			return new Double(dMin);
+			return dMin;
 		}
 	}
 
@@ -269,7 +269,7 @@ public class ExpressionFunc extends Expression
 				d = getOperand(i).evaluateDouble(ec);
 				dMax = (d > dMax) ? d : dMax;
 			}
-			return new Double(dMax);
+			return dMax;
 		}
 	}
 
@@ -338,7 +338,7 @@ public class ExpressionFunc extends Expression
 			if (type instanceof TypeInt) {
 				return evaluatePowInt(getOperand(0).evaluateInt(ec), getOperand(1).evaluateInt(ec));
 			} else {
-				return new Double(evaluatePowDouble(getOperand(0).evaluateDouble(ec), getOperand(1).evaluateDouble(ec)));
+				return evaluatePowDouble(getOperand(0).evaluateDouble(ec), getOperand(1).evaluateDouble(ec));
 			}
 		} catch (PrismLangException e) {
 			e.setASTElement(this);
@@ -410,7 +410,7 @@ public class ExpressionFunc extends Expression
 	public Object evaluateLog(EvaluateContext ec) throws PrismLangException
 	{
 		try {
-			return new Double(evaluateLog(getOperand(0).evaluateDouble(ec), getOperand(1).evaluateDouble(ec)));
+			return evaluateLog(getOperand(0).evaluateDouble(ec), getOperand(1).evaluateDouble(ec));
 		} catch (PrismLangException e) {
 			e.setASTElement(this);
 			throw e;

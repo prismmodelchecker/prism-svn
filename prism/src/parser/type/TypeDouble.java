@@ -55,7 +55,7 @@ public class TypeDouble extends Type
 	@Override
 	public Object defaultValue()
 	{
-		return new Double(0.0);
+		return 0.0;
 	}
 	
 	public static TypeDouble getInstance()
@@ -75,7 +75,7 @@ public class TypeDouble extends Type
 		if (value instanceof Double)
 			return (Double) value;
 		if (value instanceof Integer)
-			return new Double(((Integer) value).intValue());
+			return ((Integer) value).doubleValue();
 		else
 			throw new PrismLangException("Can't convert " + value.getClass() + " to type " + getTypeString());
 	}

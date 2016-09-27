@@ -55,7 +55,7 @@ public class TypeClock extends Type
 	@Override
 	public Object defaultValue()
 	{
-		return new Double(0.0);
+		return 0.0;
 	}
 	
 	public static TypeClock getInstance()
@@ -75,7 +75,7 @@ public class TypeClock extends Type
 		if (value instanceof Double)
 			return (Double) value;
 		if (value instanceof Integer)
-			return new Double(((Double) value).doubleValue());
+			return ((Integer) value).doubleValue();
 		else
 			throw new PrismLangException("Can't convert " + value.getClass() + " to type " + getTypeString());
 	}
