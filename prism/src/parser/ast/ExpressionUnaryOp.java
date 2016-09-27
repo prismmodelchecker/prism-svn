@@ -120,7 +120,7 @@ public class ExpressionUnaryOp extends Expression
 	{
 		switch (op) {
 		case NOT:
-			return new Boolean(!operand.evaluateBoolean(ec));
+			return !operand.evaluateBoolean(ec);
 		case MINUS:
 			if (type instanceof TypeInt) {
 				return -operand.evaluateInt(ec);

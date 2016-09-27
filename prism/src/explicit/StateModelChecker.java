@@ -1061,7 +1061,7 @@ public class StateModelChecker extends PrismComponent
 			// Check "for all" over filter
 			b = vals.forallOverBitSet(bsFilter);
 			// Store as object/vector
-			resObj = new Boolean(b);
+			resObj = Boolean.valueOf(b);
 			resVals = new StateValues(expr.getType(), resObj, model);
 			// Create explanation of result and print some details to log
 			resultExpl = "Property " + (b ? "" : "not ") + "satisfied in ";
@@ -1089,7 +1089,7 @@ public class StateModelChecker extends PrismComponent
 			// Check "there exists" over filter
 			b = vals.existsOverBitSet(bsFilter);
 			// Store as object/vector
-			resObj = new Boolean(b);
+			resObj = Boolean.valueOf(b);
 			resVals = new StateValues(expr.getType(), resObj, model);
 			// Create explanation of result and print some details to log
 			resultExpl = "Property satisfied in ";

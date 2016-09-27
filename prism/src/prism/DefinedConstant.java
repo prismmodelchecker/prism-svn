@@ -216,8 +216,8 @@ public class DefinedConstant
 	public void defineBoolean(String sl, String sh, String ss) throws PrismException
 	{
 		// parse value (low)
-		if (sl.equals("true")) low = new Boolean(true);
-		else if (sl.equals("false")) low = new Boolean(false);
+		if (sl.equals("true")) low = true;
+		else if (sl.equals("false")) low = false;
 		else throw new PrismException("Value " + sl + " for constant " + name + " is not a valid Boolean");
 		// no high or step allowed for booleans
 		if (sh != null) throw new PrismException("Cannot define ranges for Boolean constants");
@@ -324,8 +324,8 @@ public class DefinedConstant
 		} 
 		// boolean (case should be redundant)
 		else if (type instanceof TypeBool) { 
-			if (j == 0) return new Boolean(false);
-			else if (j == 1) return new Boolean(true);
+			if (j == 0) return false;
+			else if (j == 1) return true;
 		}
 		
 		// should never get here

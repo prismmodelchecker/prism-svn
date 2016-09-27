@@ -1206,7 +1206,7 @@ public class StateModelChecker extends PrismComponent implements ModelChecker
 			} else if (expr.getType() instanceof TypeDouble) {
 				resObj = new Double(d);
 			} else {
-				resObj = new Boolean(d > 0);
+				resObj = d > 0;
 			}
 			resVals = new StateValuesMTBDD(JDD.Constant(d), model);
 			// Create explanation of result and print some details to log
@@ -1246,7 +1246,7 @@ public class StateModelChecker extends PrismComponent implements ModelChecker
 			states = new StateListMTBDD(dd, model);
 			b = dd.equals(ddFilter);
 			// Store as object/vector
-			resObj = new Boolean(b);
+			resObj = b;
 			resVals = new StateValuesMTBDD(JDD.Constant(b ? 1.0 : 0.0), model);
 			// Set vals to null so that is not clear()-ed twice
 			vals = null;
@@ -1280,7 +1280,7 @@ public class StateModelChecker extends PrismComponent implements ModelChecker
 			dd = JDD.And(dd, ddFilter);
 			b = !dd.equals(JDD.ZERO);
 			// Store as object/vector
-			resObj = new Boolean(b);
+			resObj = b;
 			resVals = new StateValuesMTBDD(JDD.Constant(b ? 1.0 : 0.0), model);
 			// Set vals to null so that is not clear()-ed twice
 			vals = null;
@@ -1313,7 +1313,7 @@ public class StateModelChecker extends PrismComponent implements ModelChecker
 				} else if (expr.getType() instanceof TypeDouble) {
 					resObj = new Double(d);
 				} else if (expr.getType() instanceof TypeBool) {
-					resObj = new Boolean(d > 0);
+					resObj = d > 0;
 				} else {
 					throw new PrismException("Don't know how to handle result of type " + expr.getType());
 				}

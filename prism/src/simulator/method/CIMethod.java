@@ -142,16 +142,16 @@ public abstract class CIMethod extends SimulationMethod
 			//return new Double(stddev / mean); // noise
 		case -1: // -1=lower bound
 			if (mean >= theta + width)
-				return new Boolean(true);
+				return true;
 			else if (mean <= theta - width)
-				return new Boolean(false);
+				return false;
 			else
 				throw new PrismException("Approximation is not precise enough to get a result");
 		case 1: // 1=upper bound
 			if (mean >= theta + width)
-				return new Boolean(false);
+				return false;
 			else if (mean <= theta - width)
-				return new Boolean(true);
+				return true;
 			else
 				throw new PrismException("Approximation is not precise enough to get a result");
 		default:
