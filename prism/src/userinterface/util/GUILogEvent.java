@@ -55,7 +55,7 @@ public class GUILogEvent extends GUIEvent
     
     public GUILogEvent(int type, float message)
     {
-        super(type, new Float(message));
+        super(type, message);
     }
     
     public GUILogEvent(int type, long message)
@@ -65,12 +65,12 @@ public class GUILogEvent extends GUIEvent
     
     public GUILogEvent(int type, short message)
     {
-        super(type, new Short(message));
+        super(type, message);
     }
     
     public GUILogEvent(int type, byte message)
     {
-        super(type, new Byte(message));
+        super(type, message);
     }
     
     public GUILogEvent(int type, boolean message)
@@ -95,7 +95,7 @@ public class GUILogEvent extends GUIEvent
     
     public GUILogEvent(float message)
     {
-        this(PRINTLN, new Float(message));
+        this(PRINTLN, message);
     }
     
     public GUILogEvent(long message)
@@ -105,12 +105,12 @@ public class GUILogEvent extends GUIEvent
     
     public GUILogEvent(short message)
     {
-        this(PRINTLN, new Short(message));
+        this(PRINTLN, message);
     }
     
     public GUILogEvent(byte message)
     {
-        this(PRINTLN, new Byte(message));
+        this(PRINTLN, message);
     }
     
     public GUILogEvent(boolean message)
