@@ -259,7 +259,7 @@ public class CTMCModelChecker extends ProbModelChecker
 
 		// Build initial distribution (if not specified)
 		if (initDist == null) {
-			initDistNew = new StateValues(TypeDouble.getInstance(), new Double(0.0), ctmc);
+			initDistNew = new StateValues(TypeDouble.getInstance(), 0.0, ctmc);
 			double initVal = 1.0 / ctmc.getNumInitialStates();
 			for (int in : ctmc.getInitialStates()) {
 				initDistNew.setDoubleValue(in, initVal);

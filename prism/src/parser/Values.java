@@ -408,22 +408,10 @@ public class Values //implements Comparable
 	@Override
 	public Object clone()
 	{
-		Values res;
-		int i, n;
-		String s;
-		Object o;
-		
-		res = new Values();
-		n = getNumValues();
-		for (i = 0; i < n; i++) {
-			s = getName(i);
-			o = getValue(i);
-			if (o instanceof Integer) o = new Integer(((Integer)o).intValue());
-			else if (o instanceof Double) o = new Double(((Double)o).doubleValue());
-			else o = new Boolean(((Boolean)o).booleanValue());
-			res.addValue(s, o);
+		Values res = new Values();
+		for (int i = 0, n = getNumValues(); i < n; i++) {
+			res.addValue(getName(i), getValue(i));
 		}
-		
 		return res;
 	}
 

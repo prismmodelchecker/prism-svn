@@ -391,7 +391,7 @@ public class GUINetworkEditor extends JDialog implements TreeSelectionListener, 
 		{
 			if(selectedPaths[i].getLastPathComponent() instanceof FileSystem)
 			{
-				indices.add(new Integer(networkHandler.getIndex((FileSystem)selectedPaths[i].getLastPathComponent())));
+				indices.add(networkHandler.getIndex((FileSystem)selectedPaths[i].getLastPathComponent()));
 			}
 		}
 		
@@ -553,7 +553,7 @@ public class GUINetworkEditor extends JDialog implements TreeSelectionListener, 
 		};
 		addFileSystem.putValue(Action.LONG_DESCRIPTION, "Adds a new network cluster to the network profile.");
 		//computeSS.putValue(Action.SHORT_DESCRIPTION, "Compute steady-state probabilities");
-		addFileSystem.putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_C));
+		addFileSystem.putValue(Action.MNEMONIC_KEY, KeyEvent.VK_C);
 		addFileSystem.putValue(Action.NAME, "Add Network Cluster");
 		addFileSystem.putValue(Action.SMALL_ICON, GUIPrism.getIconFromImage("smallAdd.png"));
 		
@@ -585,7 +585,7 @@ public class GUINetworkEditor extends JDialog implements TreeSelectionListener, 
 		};
 		addHost.putValue(Action.LONG_DESCRIPTION, "Adds a new host to the network cluster.");
 		//computeSS.putValue(Action.SHORT_DESCRIPTION, "Compute steady-state probabilities");
-		addHost.putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_H));
+		addHost.putValue(Action.MNEMONIC_KEY, KeyEvent.VK_H);
 		addHost.putValue(Action.NAME, "Add Host");
 		addHost.putValue(Action.SMALL_ICON, GUIPrism.getIconFromImage("smallAdd.png"));
 		
@@ -599,7 +599,7 @@ public class GUINetworkEditor extends JDialog implements TreeSelectionListener, 
 		cut.putValue(Action.LONG_DESCRIPTION, "Cut");
 		//computeSS.putValue(Action.SHORT_DESCRIPTION, "Compute steady-state probabilities");
 		cut.putValue(Action.NAME, "Cut");
-		cut.putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_T));
+		cut.putValue(Action.MNEMONIC_KEY, KeyEvent.VK_T);
 		cut.putValue(Action.SMALL_ICON, GUIPrism.getIconFromImage("smallCut.png"));
 		cut.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_X, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		
@@ -613,7 +613,7 @@ public class GUINetworkEditor extends JDialog implements TreeSelectionListener, 
 		copy.putValue(Action.LONG_DESCRIPTION, "Copy");
 		//computeSS.putValue(Action.SHORT_DESCRIPTION, "Compute steady-state probabilities");
 		copy.putValue(Action.NAME, "Copy");
-		copy.putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_C));
+		copy.putValue(Action.MNEMONIC_KEY, KeyEvent.VK_C);
 		copy.putValue(Action.SMALL_ICON, GUIPrism.getIconFromImage("smallCopy.png"));
 		copy.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		
@@ -627,7 +627,7 @@ public class GUINetworkEditor extends JDialog implements TreeSelectionListener, 
 		paste.putValue(Action.LONG_DESCRIPTION, "Paste");
 		//computeSS.putValue(Action.SHORT_DESCRIPTION, "Compute steady-state probabilities");
 		paste.putValue(Action.NAME, "Paste");
-		paste.putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_P));
+		paste.putValue(Action.MNEMONIC_KEY, KeyEvent.VK_P);
 		paste.putValue(Action.SMALL_ICON, GUIPrism.getIconFromImage("smallPaste.png"));
 		paste.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		
@@ -641,7 +641,7 @@ public class GUINetworkEditor extends JDialog implements TreeSelectionListener, 
 		delete.putValue(Action.LONG_DESCRIPTION, "Delete");
 		//computeSS.putValue(Action.SHORT_DESCRIPTION, "Compute steady-state probabilities");
 		delete.putValue(Action.NAME, "Delete");
-		delete.putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_D));
+		delete.putValue(Action.MNEMONIC_KEY, KeyEvent.VK_D);
 		delete.putValue(Action.SMALL_ICON, GUIPrism.getIconFromImage("smallDelete.png"));
 		delete.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
 		
@@ -707,7 +707,7 @@ public class GUINetworkEditor extends JDialog implements TreeSelectionListener, 
 		newNetwork.putValue(Action.LONG_DESCRIPTION, "New Profile");
 		//computeSS.putValue(Action.SHORT_DESCRIPTION, "Compute steady-state probabilities");
 		newNetwork.putValue(Action.NAME, "New Profile");
-		newNetwork.putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_N));
+		newNetwork.putValue(Action.MNEMONIC_KEY, KeyEvent.VK_N);
 		newNetwork.putValue(Action.SMALL_ICON, GUIPrism.getIconFromImage("smallNew.png"));
 		
 		open = new AbstractAction()
@@ -720,7 +720,7 @@ public class GUINetworkEditor extends JDialog implements TreeSelectionListener, 
 		open.putValue(Action.LONG_DESCRIPTION, "Open Profile");
 		//computeSS.putValue(Action.SHORT_DESCRIPTION, "Compute steady-state probabilities");
 		open.putValue(Action.NAME, "Open Profile");
-		open.putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_O));
+		open.putValue(Action.MNEMONIC_KEY, KeyEvent.VK_O);
 		open.putValue(Action.SMALL_ICON, GUIPrism.getIconFromImage("smallOpen.png"));
 		
 		save = new AbstractAction()
@@ -733,7 +733,7 @@ public class GUINetworkEditor extends JDialog implements TreeSelectionListener, 
 		save.putValue(Action.LONG_DESCRIPTION, "Save Profile");
 		//computeSS.putValue(Action.SHORT_DESCRIPTION, "Compute steady-state probabilities");
 		save.putValue(Action.NAME, "Save Profile");
-		save.putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_S));
+		save.putValue(Action.MNEMONIC_KEY, KeyEvent.VK_S);
 		save.putValue(Action.SMALL_ICON, GUIPrism.getIconFromImage("smallSave.png"));
 		save.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		
@@ -747,7 +747,7 @@ public class GUINetworkEditor extends JDialog implements TreeSelectionListener, 
 		saveAs.putValue(Action.LONG_DESCRIPTION, "Save Profile As...");
 		//computeSS.putValue(Action.SHORT_DESCRIPTION, "Compute steady-state probabilities");
 		saveAs.putValue(Action.NAME, "Save Profile As...");
-		saveAs.putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_S));
+		saveAs.putValue(Action.MNEMONIC_KEY, KeyEvent.VK_S);
 		saveAs.putValue(Action.SMALL_ICON, GUIPrism.getIconFromImage("smallSaveAs.png"));
 		saveAs.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		
@@ -761,7 +761,7 @@ public class GUINetworkEditor extends JDialog implements TreeSelectionListener, 
 		close.putValue(Action.LONG_DESCRIPTION, "Close");
 		//computeSS.putValue(Action.SHORT_DESCRIPTION, "Compute steady-state probabilities");
 		close.putValue(Action.NAME, "Close");
-		close.putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_L));
+		close.putValue(Action.MNEMONIC_KEY, KeyEvent.VK_L);
 		
 		fileMenu = new JMenu("File");
 		

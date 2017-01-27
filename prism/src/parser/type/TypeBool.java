@@ -55,7 +55,7 @@ public class TypeBool extends Type
 	@Override
 	public Object defaultValue()
 	{
-		return new Boolean(false);
+		return false;
 	}
 	
 	public static TypeBool getInstance()

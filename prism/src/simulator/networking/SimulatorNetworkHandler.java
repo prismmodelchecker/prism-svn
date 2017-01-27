@@ -480,7 +480,7 @@ public class SimulatorNetworkHandler extends Observable implements EntityResolve
 				{
 					Values pcs = (Values)propertyConstantRanges.get(i);
 					double res = srf.getResult(i);
-					Object result = (res < 0.0)?null:new Double(res);
+					Object result = (res < 0.0) ? null : res;
 					resultsCollection.setResult(modelConstants, pcs, result);
 				}
 			

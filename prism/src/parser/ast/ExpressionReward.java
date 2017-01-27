@@ -139,7 +139,7 @@ public class ExpressionReward extends ExpressionQuant
 		// Expression - evaluate to an index
 		else if (rsi instanceof Expression) {
 			int i = ((Expression) rsi).evaluateInt(constantValues);
-			rsi = new Integer(i); // (for better error reporting below)
+			rsi = i; // (for better error reporting below)
 			rewStruct = i - 1;
 		}
 		// String - name of reward structure

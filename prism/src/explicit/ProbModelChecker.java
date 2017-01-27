@@ -1029,8 +1029,8 @@ public class ProbModelChecker extends NonProbModelChecker
 
 		// Compute/return the rewards
 		// A trivial case: "C<=0" (prob is 1 in target states, 0 otherwise)
-		if (timeInt == 0 || timeDouble == 0) {
-			return new StateValues(TypeDouble.getInstance(), model.getNumStates(), new Double(0));
+		if (timeInt == 0 || timeDouble == 0.0) {
+			return new StateValues(TypeDouble.getInstance(), model.getNumStates(), 0.0);
 		}
 		// Otherwise: numerical solution
 		ModelCheckerResult res = null;

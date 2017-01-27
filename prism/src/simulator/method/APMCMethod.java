@@ -148,19 +148,19 @@ public abstract class APMCMethod extends SimulationMethod
 		double estimate = sampler.getMeanValue();
 		switch (prOp) {
 		case 0: // 0=quantitative
-			return new Double(estimate);
+			return estimate;
 		case -1: // -1=lower bound
 			if (estimate >= theta + approximation)
-				return new Boolean(true);
+				return true;
 			else if (estimate <= theta - approximation)
-				return new Boolean(false);
+				return false;
 			else
 				throw new PrismException("Approximation is not precise enough to get a result");
 		case 1: // 1=upper bound
 			if (estimate >= theta + approximation)
-				return new Boolean(false);
+				return false;
 			else if (estimate <= theta - approximation)
-				return new Boolean(true);
+				return true;
 			else
 				throw new PrismException("Approximation is not precise enough to get a result");
 		default:

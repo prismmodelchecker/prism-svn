@@ -179,7 +179,7 @@ public class PrismExplicit extends PrismComponent
 		// print states
 		StateValues statesList = null;
 		try {
-			statesList = new StateValues(TypeBool.getInstance(), new Boolean(true), model);
+			statesList = new StateValues(TypeBool.getInstance(), true, model);
 		} catch (PrismLangException e) {
 			// Can't go wrong - type always fine
 		}

@@ -84,7 +84,7 @@ public class GUISimulatorDistributionDialog extends javax.swing.JDialog implemen
 		SummaryEditorKit kit = new SummaryEditorKit();
 		summaryText.setEditorKitForContentType("text/summary", kit);
 		summaryText.setContentType("text/summary");
-		summaryText.getDocument().putProperty( PlainDocument.tabSizeAttribute, new Integer(2) );
+		summaryText.getDocument().putProperty( PlainDocument.tabSizeAttribute, 2 );
 		summaryText.setSelectionColor(Color.white);
 		summaryText.setEnabled(false);
 		
@@ -144,7 +144,7 @@ public class GUISimulatorDistributionDialog extends javax.swing.JDialog implemen
 					Values mcs = undefinedConstants.getMFConstantValues();
 					Values pcs = (Values)propertyValues.get(i);
 					double res = resultsFile.getResult(i);
-					Object result = (res < 0.0)?null:new Double(res);
+					Object result = (res < 0.0) ? null : res;
 					rc.setResult(mcs, pcs, result);
 					
 				}

@@ -72,8 +72,7 @@ public abstract class SamplerBoolean extends Sampler
 	@Override
 	public Object getCurrentValue()
 	{
-		// XOR: value && !negated || !value && negated 
-		return new Boolean(value != negated);
+		return value != negated;
 	}
 
 	@Override

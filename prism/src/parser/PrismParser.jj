@@ -1471,7 +1471,7 @@ Expression ExpressionLiteral(boolean prop, boolean pathprop) :
 	<REG_INT> {
 		try {
 			int i = Integer.parseInt(getToken(0).image);
-			ret = new ExpressionLiteral(TypeInt.getInstance(), new Integer(i));
+			ret = new ExpressionLiteral(TypeInt.getInstance(), i);
 		} catch (NumberFormatException e) {
 			// Need to catch this because some matches for regexp REG_INT
 			// are not valid integers (e.g. too big).
@@ -1483,8 +1483,8 @@ Expression ExpressionLiteral(boolean prop, boolean pathprop) :
 	|
 	<REG_DOUBLE> {
 		try {
-			double d = Double.parseDouble(getToken(0).image);
-			ret = new ExpressionLiteral(TypeDouble.getInstance(), new Double(d), getToken(0).image);
+			Double d = Double.valueOf(getToken(0).image);
+			ret = new ExpressionLiteral(TypeDouble.getInstance(), d, getToken(0).image);
 		} catch (NumberFormatException e) {
 			// Need to catch this because some matches for regexp REG_DOUBLE
 			// may not be valid doubles.
@@ -1492,9 +1492,9 @@ Expression ExpressionLiteral(boolean prop, boolean pathprop) :
 			// NB: can't call generateParseException() here; it crashes
 		}}
 	|
-	<TRUE> { ret = new ExpressionLiteral(TypeBool.getInstance(), new Boolean(true)); }
+	<TRUE> { ret = new ExpressionLiteral(TypeBool.getInstance(), true); }
 	|
-	<FALSE> { ret = new ExpressionLiteral(TypeBool.getInstance(), new Boolean(false)); }
+	<FALSE> { ret = new ExpressionLiteral(TypeBool.getInstance(), false); }
 	)
 	{ ret.setPosition(getToken(0)); return ret; }
 }

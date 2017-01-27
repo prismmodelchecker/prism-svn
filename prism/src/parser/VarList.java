@@ -322,11 +322,11 @@ public class VarList
 		Type type = getType(var);
 		// Integer type
 		if (type instanceof TypeInt) {
-			return new Integer(val + getLow(var));
+			return val + getLow(var);
 		}
 		// Boolean type
 		else if (type instanceof TypeBool) {
-			return new Boolean(val != 0);
+			return val != 0;
 		}
 		// Anything else
 		return null;

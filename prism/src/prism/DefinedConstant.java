@@ -150,9 +150,9 @@ public class DefinedConstant
 		// store 'actual' value for high
 		ih = ihNew;
 		// store Object versions
-		low = new Integer(il);
-		high = new Integer(ih);
-		step = new Integer(is);
+		low = il;
+		high = ih;
+		step = is;
 	}
 	
 	public void defineDouble(String sl, String sh, String ss) throws PrismException
@@ -208,16 +208,16 @@ public class DefinedConstant
 		// store 'actual' value for high
 		dh = dhNew;
 		// store Object versions
-		low = new Double(dl);
-		high = new Double(dh);
-		step = new Double(ds);
+		low = dl;
+		high = dh;
+		step = ds;
 	}
 	
 	public void defineBoolean(String sl, String sh, String ss) throws PrismException
 	{
 		// parse value (low)
-		if (sl.equals("true")) low = new Boolean(true);
-		else if (sl.equals("false")) low = new Boolean(false);
+		if (sl.equals("true")) low = true;
+		else if (sl.equals("false")) low = false;
 		else throw new PrismException("Value " + sl + " for constant " + name + " is not a valid Boolean");
 		// no high or step allowed for booleans
 		if (sh != null) throw new PrismException("Cannot define ranges for Boolean constants");
@@ -251,7 +251,7 @@ public class DefinedConstant
 			iv = ((Integer)value).intValue();
 			// if possible, increment
 			if (iv+is<=ih) {
-				value = new Integer(iv+is);
+				value = iv+is;
 			}
 			// otherwise, reset to low value, note overflow
 			else {
@@ -269,7 +269,7 @@ public class DefinedConstant
 			int index = getValueIndex(value) + 1;			
 			dv = dl + index * ds; 
 			if (dv <= dh + DOUBLE_PRECISION_CORRECTION * ds) {
-				value = new Double(dv);
+				value = dv;
 			}
 			// otherwise, reset to low value, note overflow
 			else {
@@ -311,7 +311,7 @@ public class DefinedConstant
 			is = ((Integer)step).intValue();
 			iv = il;
 			for (i = 0; i < j; i++) iv += is;
-			return new Integer(iv);
+			return iv;
 		}
 		// double
 		else if (type instanceof TypeDouble) {
@@ -320,12 +320,12 @@ public class DefinedConstant
 			dv = dl;
 			//for (i = 0; i < j; i++) dv += ds;			
 			dv = dl + j * ds;
-			return new Double(dv);
+			return dv;
 		} 
 		// boolean (case should be redundant)
 		else if (type instanceof TypeBool) { 
-			if (j == 0) return new Boolean(false);
-			else if (j == 1) return new Boolean(true);
+			if (j == 0) return false;
+			else if (j == 1) return true;
 		}
 		
 		// should never get here

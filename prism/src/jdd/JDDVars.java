@@ -397,7 +397,9 @@ public class JDDVars implements Iterable<JDDNode>
 			@Override
 			public int compare(JDDNode a, JDDNode b)
 			{
-				return new Integer(a.getIndex()).compareTo(b.getIndex());
+				int x = a.getIndex();
+				int y = b.getIndex();
+				return (x < y) ? -1 : ((x == y) ? 0 : 1);
 			}
 		});
 	}
