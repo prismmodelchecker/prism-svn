@@ -12,5 +12,6 @@
 	<classpathentry kind="lib" path="lib/jas.jar"/>
 	<classpathentry kind="lib" path="lib/log4j.jar"/>
 	<classpathentry kind="lib" path="lib/nailgun-server.jar"/>
+	<classpathentry kind="lib" path="lib/glpk-java.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

@@ -75,6 +75,8 @@ public class ProbModelChecker extends NonProbModelChecker
 	protected double termCritParam = 1e-8;
 	// Max iterations for numerical solution
 	protected int maxIters = 100000;
+	// Floating point precision
+	protected int precision = 64;
 	// Use precomputation algorithms in model checking?
 	protected boolean precomp = true;
 	protected boolean prob0 = true;
@@ -95,7 +97,7 @@ public class ProbModelChecker extends NonProbModelChecker
 
 	// Method used for numerical solution
 	public enum LinEqMethod {
-		POWER, JACOBI, GAUSS_SEIDEL, BACKWARDS_GAUSS_SEIDEL, JOR, SOR, BACKWARDS_SOR;
+		POWER, JACOBI, GAUSS_SEIDEL, BACKWARDS_GAUSS_SEIDEL, EXACT_LINEAR_PROGRAMMING, JOR, SOR, BACKWARDS_SOR;
 		public String fullName()
 		{
 			switch (this) {
@@ -107,6 +109,8 @@ public class ProbModelChecker extends NonProbModelChecker
 				return "Gauss-Seidel";
 			case BACKWARDS_GAUSS_SEIDEL:
 				return "Backwards Gauss-Seidel";
+			case EXACT_LINEAR_PROGRAMMING:
+				return "Exact linear programming";
 			case JOR:
 				return "JOR";
 			case SOR:
@@ -121,7 +125,7 @@ public class ProbModelChecker extends NonProbModelChecker
 
 	// Method used for solving MDPs
 	public enum MDPSolnMethod {
-		VALUE_ITERATION, GAUSS_SEIDEL, POLICY_ITERATION, MODIFIED_POLICY_ITERATION, LINEAR_PROGRAMMING;
+		VALUE_ITERATION, GAUSS_SEIDEL, POLICY_ITERATION, MODIFIED_POLICY_ITERATION, LINEAR_PROGRAMMING, EXACT_LINEAR_PROGRAMMING;
 		public String fullName()
 		{
 			switch (this) {
@@ -135,6 +139,8 @@ public class ProbModelChecker extends NonProbModelChecker
 				return "Modified policy iteration";
 			case LINEAR_PROGRAMMING:
 				return "Linear programming";
+			case EXACT_LINEAR_PROGRAMMING:
+				return "Exact linear programming";
 			default:
 				return this.toString();
 			}
@@ -153,7 +159,7 @@ public class ProbModelChecker extends NonProbModelChecker
 
 	// Method used for numerical solution
 	public enum SolnMethod {
-		VALUE_ITERATION, GAUSS_SEIDEL, POLICY_ITERATION, MODIFIED_POLICY_ITERATION, LINEAR_PROGRAMMING
+		VALUE_ITERATION, GAUSS_SEIDEL, POLICY_ITERATION, MODIFIED_POLICY_ITERATION, LINEAR_PROGRAMMING, EXACT_LINEAR_PROGRAMMING
 	};
 
 	/**
@@ -182,6 +188,8 @@ public class ProbModelChecker extends NonProbModelChecker
 				setLinEqMethod(LinEqMethod.SOR);
 			} else if (s.equals("Backwards SOR")) {
 				setLinEqMethod(LinEqMethod.BACKWARDS_SOR);
+			} else if (s.equals("Exact linear programming")) {
+				setLinEqMethod(LinEqMethod.EXACT_LINEAR_PROGRAMMING);
 			} else {
 				throw new PrismNotSupportedException("Explicit engine does not support linear equation solution method \"" + s + "\"");
 			}
@@ -197,6 +205,8 @@ public class ProbModelChecker extends NonProbModelChecker
 				setMDPSolnMethod(MDPSolnMethod.MODIFIED_POLICY_ITERATION);
 			} else if (s.equals("Linear programming")) {
 				setMDPSolnMethod(MDPSolnMethod.LINEAR_PROGRAMMING);
+			} else if (s.equals("Exact linear programming")) {
+				setMDPSolnMethod(MDPSolnMethod.EXACT_LINEAR_PROGRAMMING);
 			} else {
 				throw new PrismNotSupportedException("Explicit engine does not support MDP solution method \"" + s + "\"");
 			}
@@ -213,6 +223,8 @@ public class ProbModelChecker extends NonProbModelChecker
 			setTermCritParam(settings.getDouble(PrismSettings.PRISM_TERM_CRIT_PARAM));
 			// PRISM_MAX_ITERS
 			setMaxIters(settings.getInteger(PrismSettings.PRISM_MAX_ITERS));
+			// PRISM_PRECISION
+			setPrecision(settings.getInteger(PrismSettings.PRISM_EXACTLP_PRECISION));
 			// PRISM_PRECOMPUTATION
 			setPrecomp(settings.getBoolean(PrismSettings.PRISM_PRECOMPUTATION));
 			// PRISM_PROB0
@@ -250,6 +262,7 @@ public class ProbModelChecker extends NonProbModelChecker
 		setTermCrit(other.getTermCrit());
 		setTermCritParam(other.getTermCritParam());
 		setMaxIters(other.getMaxIters());
+		setPrecision(other.getPrecision());
 		setPrecomp(other.getPrecomp());
 		setProb0(other.getProb0());
 		setProb1(other.getProb1());
@@ -269,6 +282,7 @@ public class ProbModelChecker extends NonProbModelChecker
 		mainLog.print("termCrit = " + termCrit + " ");
 		mainLog.print("termCritParam = " + termCritParam + " ");
 		mainLog.print("maxIters = " + maxIters + " ");
+		mainLog.print("precision = " + precision + " ");
 		mainLog.print("precomp = " + precomp + " ");
 		mainLog.print("prob0 = " + prob0 + " ");
 		mainLog.print("prob1 = " + prob1 + " ");
@@ -325,6 +339,14 @@ public class ProbModelChecker extends NonProbModelChecker
 	public void setMaxIters(int maxIters)
 	{
 		this.maxIters = maxIters;
+	}
+
+	/**
+	 * Set accuracy in bits for arbitrary precision results.
+	 */
+	public void setPrecision(int precision)
+	{
+		this.precision = precision;
 	}
 
 	/**
@@ -423,6 +445,11 @@ public class ProbModelChecker extends NonProbModelChecker
 	public int getMaxIters()
 	{
 		return maxIters;
+	}
+
+	public int getPrecision()
+	{
+		return precision;
 	}
 
 	public boolean getPrecomp()

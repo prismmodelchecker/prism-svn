@@ -29,8 +29,17 @@ package explicit;
 import java.io.File;
 import java.util.Arrays;
 import java.util.BitSet;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.gnu.glpk.GLPK;
+import org.gnu.glpk.GLPKConstants;
+import org.gnu.glpk.SWIGTYPE_p_double;
+import org.gnu.glpk.SWIGTYPE_p_int;
+import org.gnu.glpk.glp_prob;
+import org.gnu.glpk.glp_smcp;
 
 import parser.VarList;
 import parser.ast.Declaration;
@@ -586,7 +595,8 @@ public class DTMCModelChecker extends ProbModelChecker
 		LinEqMethod linEqMethod = this.linEqMethod;
 
 		// Switch to a supported method, if necessary
-		if (!(linEqMethod == LinEqMethod.POWER || linEqMethod == LinEqMethod.GAUSS_SEIDEL)) {
+		if (!(linEqMethod == LinEqMethod.POWER || linEqMethod == LinEqMethod.GAUSS_SEIDEL
+				|| linEqMethod == LinEqMethod.EXACT_LINEAR_PROGRAMMING || GLPK.EXACTLP_REQUIREMENTS == 0)) {
 			linEqMethod = LinEqMethod.GAUSS_SEIDEL;
 			mainLog.printWarning("Switching to linear equation solution method \"" + linEqMethod.fullName() + "\"");
 		}
@@ -664,6 +674,9 @@ public class DTMCModelChecker extends ProbModelChecker
 			break;
 		case GAUSS_SEIDEL:
 			res = computeReachProbsGaussSeidel(dtmc, no, yes, init, known);
+			break;
+		case EXACT_LINEAR_PROGRAMMING:
+			res = computeReachProbsExactLinearProg(dtmc, no, yes, init, known);
 			break;
 		default:
 			throw new PrismException("Unknown linear equation solution method " + linEqMethod.fullName());
@@ -1103,6 +1116,265 @@ public class DTMCModelChecker extends ProbModelChecker
 		res = new ModelCheckerResult();
 		res.soln = soln;
 		res.numIters = iters;
+		res.timeTaken = timer / 1000.0;
+		return res;
+	}
+
+	/**
+	 * Compute arbitrary precision reachability probabilities using linear programming.
+	 * @param dtmc The DTMC
+	 * @param no Probability 0 states
+	 * @param yes Probability 1 states
+	 * @param init Optionally, an initial solution vector (will be overwritten) 
+	 * @param known Optionally, a set of states for which the exact answer is known
+	 * Note: if 'known' is specified (i.e. is non-null, 'init' must also be given and is used for the exact values.  
+	 */
+	protected ModelCheckerResult computeReachProbsExactLinearProg(DTMC dtmc, BitSet no, BitSet yes, double init[], BitSet known) throws PrismException
+	{
+		ModelCheckerResult res;
+		BitSet unknown;
+		int i, nStates, maybeSize, countMaybeTrans, ret;
+		double sol, soln[], initVal, matAEntry, bEntry;
+		long timer, matATimer, exactSolverTimer;
+		SWIGTYPE_p_int ind;
+		SWIGTYPE_p_double val;
+		glp_smcp parm;
+		glp_prob lp;
+
+		// Start value iteration
+		timer = System.currentTimeMillis();
+		mainLog.println("Starting exact linear programming...");
+
+		// Store num states
+		nStates = dtmc.getNumStates();
+
+		// Determine the set of maybe states (S?)
+		unknown = new BitSet();
+		unknown.set(0, nStates);
+		unknown.andNot(yes);
+		unknown.andNot(no);
+		if (known != null)
+			unknown.andNot(known);
+
+		// Create solution vector
+		soln = (init == null) ? new double[nStates] : init;
+
+		// Initialise solution vector. Use (where available) the following in order of preference:
+		// (1) exact answer, if already known; (2) 1.0/0.0 if in yes/no; (3) passed in initial value; (4) initVal
+		// where initVal is 0.0 or 1.0, depending on whether we converge from below/above. 
+		initVal = (valIterDir == ValIterDir.BELOW) ? 0.0 : 1.0;
+		if (init != null) {
+			if (known != null) {
+				for (i = 0; i < nStates; i++)
+					soln[i] = known.get(i) ? init[i] : yes.get(i) ? 1.0 : no.get(i) ? 0.0 : init[i];
+			} else {
+				for (i = 0; i < nStates; i++)
+					soln[i] = yes.get(i) ? 1.0 : no.get(i) ? 0.0 : init[i];
+			}
+		} else {
+			for (i = 0; i < nStates; i++)
+				soln[i] = yes.get(i) ? 1.0 : no.get(i) ? 0.0 : initVal;
+		}
+
+		// Store the cardinality of the maybe state
+		maybeSize = unknown.cardinality();
+
+		// If we have states to compute values for
+		if (maybeSize > 0) {
+			// A mapping between maybe states and its positions in the maybe bitset.
+			// This is useful for calculating the `A` matrix later on.
+			// Also, calculate the number of the transitions of all maybe states `countMaybeTrans`
+			countMaybeTrans = 0;
+			HashMap<Integer,Integer> maybeToState = new HashMap<Integer,Integer>();
+			HashMap<Integer,Integer> stateToMaybe = new HashMap<Integer,Integer>();
+			int maybeStateCount = 1;
+			for(int state = unknown.nextSetBit(0); state >= 0; state = unknown.nextSetBit(state + 1)) {
+				maybeToState.put(maybeStateCount, state);
+				stateToMaybe.put(state, maybeStateCount);
+				countMaybeTrans++;
+				maybeStateCount++;
+			}
+
+			// Memory allocation for index and value arrays.
+			// For each transition, GLPK stores the values for each state in the maybe set
+			// and uses these arrays as temporal storage
+			ind = GLPK.new_intArray(maybeSize + 1);
+			val = GLPK.new_doubleArray(maybeSize + 1);
+
+			// Construct max (min) linear programming problem.
+			// First, we put the problem in the canonical form
+			// and then apply the duality definition
+			lp = GLPK.glp_create_prob();
+			mainLog.println("Linear programming problem created");
+
+			// Set the lp constants for the dual simplex method.
+			// columns -> one for each transition
+			// rows -> maybe states
+			GLPK.glp_add_cols(lp, countMaybeTrans);
+			GLPK.glp_add_rows(lp, maybeSize);
+			GLPK.intArray_setitem(ind, 0, 0);
+			GLPK.doubleArray_setitem(val, 0, 0);
+
+			// Constraints for each equation expressed as inequalities.
+			// For the min (max) problem, each equation has -1 as a upper (lower) bound and we compute the max (min).
+			// This was obtained rewriting the problems (6) (7) in their canonical form, and then construct the dual.
+			// The `-1` bounds correspond to the values of the cost vector (remember that we put the problems
+			// in canonical form first).
+			// Also, we set each row (representing a maybe state) as part of the basis defined in (10)
+			for (int row = 1; row <= maybeSize; row++) {
+				// The name of the state
+				GLPK.glp_set_row_name(lp, row, "s" + unknown.nextSetBit(row));
+				GLPK.glp_set_row_bnds(lp, row, GLPKConstants.GLP_UP, 0, -1);
+				GLPK.glp_set_obj_dir(lp, GLPKConstants.GLP_MAX);
+				GLPK.glp_set_row_stat(lp, row, GLPKConstants.GLP_BS);
+				GLPK.intArray_setitem(ind, row, 0);
+				GLPK.doubleArray_setitem(val, row, 0);
+			}
+
+			// The current column of the matrix (transition)
+			int currentTransition = 1;
+			matATimer = System.currentTimeMillis();
+			// Fill out the (A | I) matrix (lp problem equations) of the reachability problem.
+			// In this step, we calculate the values for each entry of the A matrix,
+			// going through all maybe states and their transitions for each choice
+			for (int state = unknown.nextSetBit(0); state >= 0; state = unknown.nextSetBit(state + 1)) {
+				// Index of the i-th equation in the lp's matrix
+				int eqIndex = 1;
+				Iterator<Map.Entry<Integer, Double>> iter = dtmc.getTransitionsIterator(state);
+				bEntry = 0.;
+				boolean pointsToItself = false;
+				// Iterate over the transitions between st and choice
+				while (iter.hasNext()) {
+					matAEntry = 0.;
+					Map.Entry<Integer, Double> entry = iter.next();
+					int actualKey = entry.getKey();
+					// Skip if the probability is 0
+					if (entry.getValue() == 0)
+						continue;
+					// Calculate the entries (summation) for the b vector (constraint vector)
+					if (yes.get(actualKey))
+						bEntry += entry.getValue();
+					// If it is a maybe state, we calculate the matrix entry as defined on
+					// page 8 of the paper
+					if (unknown.get(actualKey)) {
+						if (actualKey == state) {
+							pointsToItself = true;
+							matAEntry = entry.getValue() - 1;
+						} else {
+							matAEntry = entry.getValue();
+						}
+						// Write the entry of each equation in the array
+						GLPK.intArray_setitem(ind, eqIndex, stateToMaybe.get(actualKey));
+						GLPK.doubleArray_setitem(val, eqIndex, matAEntry);
+						eqIndex++;
+					}
+				}
+				// If the state does not point to itself, then fill out the missing entry
+				if (!pointsToItself) {
+					GLPK.intArray_setitem(ind, eqIndex, stateToMaybe.get(state));
+					GLPK.doubleArray_setitem(val, eqIndex, -1);
+					eqIndex++;
+				}
+
+				// Set the values of the arrays in the full linear programming equation matrix.
+				// Negate the summation calculated for the constraint vector entries
+				GLPK.glp_set_col_bnds(lp, currentTransition, GLPKConstants.GLP_LO, 0, 0);
+				GLPK.glp_set_mat_col(lp, currentTransition, eqIndex - 1, ind, val);
+				GLPK.glp_set_obj_coef(lp, currentTransition, -bEntry);
+
+				currentTransition++;
+			}
+			mainLog.println("Linear programming equations construction time: " +
+					((double)System.currentTimeMillis() - matATimer)/1000 + " seconds");
+
+			// Solving the linear problem in the linear programming library GLPK.
+			// probs[]: an array for storing the exact probabilities as string in the form `p/q`
+			// `num` and `den` store the temporal `p` and `q` respectively (this could be avoided)
+			String probs[] = new String[nStates];
+
+			// Set up exact parameters
+			parm = new glp_smcp();
+			GLPK.glp_init_smcp(parm);
+			parm.setPrecision(this.getPrecision());
+			parm.setNum_states(nStates);
+
+			// Solve lp problem
+			exactSolverTimer = System.currentTimeMillis();
+			ret = GLPK.glp_exact(lp, parm);
+
+			// Check return value: if `ret` is not zero there has been an error
+			if (ret != 0) {
+				String msg;
+				if (ret == GLPKConstants.GLP_EBADB) {
+					msg = "The initial basis specified in the problem object is invalid: wrong number of basic variables";
+				} else if (ret == GLPKConstants.GLP_ESING) {
+					msg = "The basis matrix corresponding to the initial basis is singular";
+				} else if (ret == GLPKConstants.GLP_EBOUND) {
+					msg = "Some double-bounded variables have incorrect bound";
+				} else {
+					msg = "The linear programming problem could not be solved";
+				}
+				mainLog.println(msg);
+				throw new PrismException(msg);
+			}
+
+			// Calculate and store exact probabilities.
+			// For each maybe state, we extract the fixed precision results from GLPK and store them in `probs[]`.
+			// `sol` stores the exact values as doubles. That implies that the precision is at most 64-bit
+			// However, the exact value is expressed as a string in `probs[]`.
+			sol = GLPK.glp_get_obj_val(lp);
+			String currentResult;
+			int exp;
+			mainLog.println("\n" + this.getPrecision() + "-bit results (non-zero only) for each state of the DTMC:");
+			for (int dtmcState = 0; dtmcState < nStates; dtmcState++) {
+				if (unknown.get(dtmcState)) {
+					sol = GLPK.glp_get_row_dual(lp, stateToMaybe.get(dtmcState));
+					soln[dtmcState] = sol;
+					currentResult = GLPK.uint8Array_toString(GLPK.uint8ArrayArray_getitem(GLPK.glp_get_probs(lp), stateToMaybe.get(dtmcState) - 1));
+					exp = GLPK.intArray_getitem(GLPK.glp_get_exps(lp), stateToMaybe.get(dtmcState) - 1);
+					// We need to format the output since we get the exponent as a position in the string
+					String zeroes = "";
+					for (int nZero = 0; nZero < Math.abs(exp); nZero++)
+						zeroes += "0";
+					currentResult = exp > 0 ? new StringBuilder(currentResult).insert(exp, ".").toString() : "0." + zeroes + currentResult;
+					probs[dtmcState] = currentResult; 
+				}
+				// If it is a `yes` state, its probability is 1
+				else if (yes.get(dtmcState)) {
+					soln[dtmcState] = 1.;
+					probs[dtmcState] = "1";
+				}
+				// If it is a `no` state, its probability is 0
+				else if (no.get(dtmcState)) {
+					soln[dtmcState] = 0.;
+					probs[dtmcState] = "0";
+				}
+				// Avoid zero entries
+				if (probs[dtmcState] != "0")
+					mainLog.println("[" + dtmcState + "]: " + probs[dtmcState]);
+			}
+			mainLog.println("\nExact probabilities calculation time: " +
+					((double)System.currentTimeMillis() - exactSolverTimer)/1000 + " seconds");
+
+			// Free memory
+			GLPK.delete_intArray(ind);
+			GLPK.delete_doubleArray(val);
+			GLPK.delete_intArray(GLPK.glp_get_exps(lp));
+			GLPK.delete_uint8ArrayArray(GLPK.glp_get_probs(lp));
+			GLPK.delete_uint8ArrayArray(GLPK.glp_get_nums(lp));
+			GLPK.delete_uint8ArrayArray(GLPK.glp_get_dens(lp));
+			GLPK.glp_delete_prob(lp);
+
+		}
+
+		// Finished linear programming
+		timer = System.currentTimeMillis() - timer;
+		mainLog.print("Exact linear programming");
+		mainLog.println(" took " + timer / 1000.0 + " seconds.");
+
+		// Return results
+		res = new ModelCheckerResult();
+		res.soln = soln;
 		res.timeTaken = timer / 1000.0;
 		return res;
 	}
